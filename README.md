@@ -34,3 +34,25 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+### Commit Types
+
+| Type       | Description                                                    |
+|------------|----------------------------------------------------------------|
+| `feat`     | Adds a new feature                                             |
+| `fix`      | Fixes a bug                                                    |
+| `chore`    | General maintenance tasks, not affecting source code or tests  |
+| `docs`     | Documentation changes                                          |
+| `style`    | Code style updates (formatting, missing semi-colons, etc.)     |
+| `refactor` | Code refactoring without adding features or fixing bugs        |
+| `perf`     | Performance improvement                                        |
+| `test`     | Adding or updating tests                                       |
+| `build`    | Changes affecting the build system or dependencies             |
+
+### Examples
+
+- **Feature**: `feat(auth): add user registration flow`
+- **Bug Fix**: `fix(ui): resolve button alignment issue on mobile`
+- **Chore**: `chore(deps): update eslint to latest version`
+- **Documentation**: `docs(readme): update setup instructions`
