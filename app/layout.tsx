@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 
+import { Toaster } from "react-hot-toast";
+
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
 import "./globals.css";
@@ -35,6 +37,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 5000,
+              removeDelay: 1000,
+            }}
+          />
           {children}
         </ThemeProvider>
       </body>
