@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Github, Mail } from "lucide-react";
 import toast from "react-hot-toast";
 
+import { env } from "@/env";
 import { signIn } from "@/lib/auth-client";
 
 import { Button } from "../ui/button";
@@ -31,7 +32,9 @@ export const SocialSigninForm = () => {
       await signIn.social(
         {
           provider: providerKey,
-          callbackURL: callback ?? "http://localhost:3000/",
+          callbackURL: callback
+            ? `${env.NEXT_PUBLIC_URL}${callback}`
+            : env.NEXT_PUBLIC_URL,
         },
         {
           onSuccess: () => {
