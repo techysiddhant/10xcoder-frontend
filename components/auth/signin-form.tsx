@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { env } from "@/env";
 import { signIn } from "@/lib/auth-client";
 import { signInSchema } from "@/lib/schema";
 
@@ -39,7 +40,7 @@ export const SigninForm = () => {
         {
           email: data.email,
           password: data.password,
-          callbackURL: "http://localhost:3000",
+          callbackURL: env.NEXT_PUBLIC_URL,
         },
         {
           onRequest: () => {
