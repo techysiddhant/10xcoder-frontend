@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { SignupForm } from "@/components/auth/signup-form";
 import { SocialSigninForm } from "@/components/auth/social-signin-form";
@@ -14,7 +15,9 @@ const SignUpPage = () => {
           </p>
         </div>
         <div className="space-y-4">
-          <SocialSigninForm />
+          <Suspense>
+            <SocialSigninForm />
+          </Suspense>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-gray-300 dark:border-gray-600" />
