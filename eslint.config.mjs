@@ -20,6 +20,7 @@ const eslintConfig = [
         "semi": ["error"],
         "quotes": ["error", "double"],
         "n/no-process-env": ["error"],
+        "react/no-unescaped-entities": ["error"],
         "check-file/filename-naming-convention": [
           "error",
           {
