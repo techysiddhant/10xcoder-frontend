@@ -15,45 +15,39 @@ export const SocialSigninForm = () => {
   const searchParams = useSearchParams();
   const callback = searchParams.get("callbackUrl");
   const handleSocialSignUp = async (provider: string) => {
-    setIsLoading(true);
-    switch (provider) {
-      case "Google":
-        await signIn.social(
-          {
-            provider: "google",
-            callbackURL: callback ? callback : "http://localhost:3000/",
-          },
-          {
-            onSuccess: () => {
-              toast.success("Logged in successfully");
-            },
-            onError: (ctx) => {
-              toast.error(ctx.error.message ?? "Something went wrong.");
-            },
-          }
-        );
-        break;
-      case "GitHub":
-        await signIn.social(
-          {
-            provider: "github",
-            callbackURL: callback ? callback : "http://localhost:3000/",
-          },
-          {
-            onSuccess: () => {
-              toast.success("Logged in successfully");
-            },
-            onError: (ctx) => {
-              toast.error(ctx.error.message ?? "Something went wrong.");
-            },
-          }
-        );
-        break;
-      default:
+    try {
+      setIsLoading(true);
+      const providerMap: Record<string, "google" | "github"> = {
+        Google: "google",
+        GitHub: "github",
+      };
+
+      const providerKey = providerMap[provider];
+      if (!providerKey) {
         console.error("Invalid provider");
-        break;
+        return;
+      }
+
+      await signIn.social(
+        {
+          provider: providerKey,
+          callbackURL: callback ?? "http://localhost:3000/",
+        },
+        {
+          onSuccess: () => {
+            toast.success("Logged in successfully");
+          },
+          onError: (ctx) => {
+            toast.error(ctx.error.message ?? "Something went wrong.");
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Unable to connect to authentication service");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
   return (
     <div className="grid grid-cols-2 gap-4">

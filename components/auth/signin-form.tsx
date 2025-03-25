@@ -34,32 +34,37 @@ export const SigninForm = () => {
     },
   });
   const onSubmit = async (data: FormValues) => {
-    setIsLoading(true);
-    await signIn.email(
-      {
-        email: data.email,
-        password: data.password,
-        callbackURL: "http://localhost:3000",
-      },
-      {
-        onRequest: () => {
-          setIsLoading(true);
+    try {
+      await signIn.email(
+        {
+          email: data.email,
+          password: data.password,
+          callbackURL: "http://localhost:3000",
         },
-        onSuccess: () => {
-          setIsLoading(false);
-          form.reset();
-          toast.success("Logged in successfully");
-        },
-        onError: (ctx) => {
-          setIsLoading(false);
-          if (ctx.error.status === 403) {
-            toast.error("Please verify your email address");
-            return;
-          }
-          toast.error(ctx.error.message ?? "Something went wrong");
-        },
-      }
-    );
+        {
+          onRequest: () => {
+            setIsLoading(true);
+          },
+          onSuccess: () => {
+            setIsLoading(false);
+            form.reset();
+            toast.success("Logged in successfully");
+          },
+          onError: (ctx) => {
+            setIsLoading(false);
+            if (ctx.error.status === 403) {
+              toast.error("Please verify your email address");
+              return;
+            }
+            toast.error(ctx.error.message ?? "Something went wrong");
+          },
+        }
+      );
+    } catch (error) {
+      setIsLoading(false);
+      toast.error("Failed to connect to authentication service");
+      console.error(error);
+    }
   };
   return (
     <Form {...form}>

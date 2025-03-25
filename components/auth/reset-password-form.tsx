@@ -72,6 +72,7 @@ export const ResetPasswordForm = () => {
       newPassword: data.password,
     });
     if (error) {
+      setIsLoading(false);
       toast.error(error.message ?? "Something went wrong.");
     } else {
       form.reset();
