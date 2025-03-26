@@ -180,3 +180,6 @@
   }
   
 }
+.glass-card {
+  @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200/60 dark:border-slate-700/60 rounded-xl shadow-sm transition-all;
+}
