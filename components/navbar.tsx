@@ -145,7 +145,7 @@ export const Navbar = () => {
             </motion.div>
           ) : (
             <div className="flex items-center space-x-2 lg:hidden">
-              {/* <ThemeToggler /> */}
+              <ThemeToggler />
               {!user ? (
                 <Button asChild size={"sm"}>
                   <Link href="/signup">Get Started</Link>

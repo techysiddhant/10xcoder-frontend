@@ -34,7 +34,7 @@ export const ProfileMenu = () => {
       <DropdownMenuTrigger>
         <Avatar className="size-9 shadow-lg drop-shadow-xs">
           <AvatarImage
-            src={`https://avatar.vercel.sh/${user?.name}.svg?text=${user?.name.slice(0, 2).toUpperCase()}`}
+            src={`https://avatar.vercel.sh/${user?.name || "user"}.svg?text=${user?.name ? user.name.slice(0, 2).toUpperCase() : "NN"}`}
             alt="profile-picture"
             className="object-contain"
           />
@@ -46,11 +46,11 @@ export const ProfileMenu = () => {
       <DropdownMenuContent>
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/profile")}>
           <User />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/settings")}>
           <Settings />
           <span>Settings</span>
         </DropdownMenuItem>
