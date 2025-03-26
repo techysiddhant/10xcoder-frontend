@@ -178,6 +178,7 @@ export const Navbar = () => {
               <Link
                 key={link.path}
                 href={link.path}
+                onClick={() => setMobileMenuOpen(false)}
                 className={`block rounded-md px-3 py-3 text-base font-medium ${
                   pathname === link.path
                     ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"

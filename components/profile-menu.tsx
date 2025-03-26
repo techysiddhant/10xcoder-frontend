@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { LogOut, Settings, User } from "lucide-react";
 
@@ -18,12 +19,15 @@ import { authClient } from "@/lib/auth-client";
 
 export const ProfileMenu = () => {
   const { data: session } = useSession();
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const user = session?.user;
   const router = useRouter();
   const handleSignOut = async () => {
+    setIsSigningOut(true);
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
+          setIsSigningOut(false);
           router.push("/");
         },
       },
@@ -39,7 +43,7 @@ export const ProfileMenu = () => {
             className="object-contain"
           />
           <AvatarFallback className="bg-blue-100 text-xl font-semibold text-blue-500 uppercase">
-            {user?.name ? user?.name?.slice(0, 1) : "C"}
+            {user?.name ? user?.name?.slice(0, 2) : "NN"}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
@@ -54,9 +58,9 @@ export const ProfileMenu = () => {
           <Settings />
           <span>Settings</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleSignOut}>
+        <DropdownMenuItem onClick={handleSignOut} disabled={isSigningOut}>
           <LogOut />
-          <span>Log out</span>
+          <span>{isSigningOut ? "Signing out..." : "Sign out"}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
