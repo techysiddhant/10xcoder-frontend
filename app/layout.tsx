@@ -3,6 +3,7 @@ import { Inter, Poppins } from "next/font/google";
 
 import { Toaster } from "react-hot-toast";
 
+import ReactQueryProvider from "@/components/providers/react-query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
 import "./globals.css";
@@ -37,14 +38,16 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 5000,
-              removeDelay: 1000,
-            }}
-          />
-          {children}
+          <ReactQueryProvider>
+            {children}
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 5000,
+                removeDelay: 1000,
+              }}
+            />
+          </ReactQueryProvider>
         </ThemeProvider>
       </body>
     </html>
