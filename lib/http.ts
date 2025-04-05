@@ -12,3 +12,16 @@ export const getResource = (resourceId: string) =>
   api.get(`/resources/${resourceId}`, {
     withCredentials: true,
   });
+export const getResources = (queryString: string) =>
+  api.get(`/resources?${queryString}`, {
+    withCredentials: true,
+  });
+
+export const getCategories = () =>
+  api.get("/categories", {
+    withCredentials: true,
+  });
+export const getTags = () =>
+  api.get("/tags", {
+    withCredentials: true,
+  });
