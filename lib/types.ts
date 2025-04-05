@@ -15,11 +15,11 @@ export type ResourceType = {
   url: string;
   image?: string | null;
   isPublished: boolean;
-  createdAt: Date;
+  createdAt: string;
   updatedAt: Date;
   tags: string[];
   categories: CategoryType;
-  description?: string;
+  description: string | null;
   upvoteCount: number;
   userId: string;
 };
