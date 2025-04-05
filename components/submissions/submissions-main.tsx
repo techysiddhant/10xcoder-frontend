@@ -98,6 +98,7 @@ export const SubmissionsMain = () => {
                           {resource.resourceType}
                         </TableCell>
                         <TableCell>{resource.categoryName}</TableCell>
+                        <TableCell>{formatDate(resource.createdAt)}</TableCell>
                         <TableCell>
                           {resource?.tags?.length == 0 ? (
                             <p>no tags available</p>
@@ -109,7 +110,6 @@ export const SubmissionsMain = () => {
                             ))
                           )}
                         </TableCell>
-                        <TableCell>{formatDate(resource.createdAt)}</TableCell>
                         {/* <TableCell>{renderStatusBadge(submission.status)}</TableCell> */}
                         <TableCell>
                           <div className="flex justify-end gap-2">

@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Image, Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -60,7 +60,7 @@ export const SubmitResourceForm = ({
   initialData,
 }: SubmitResourceFormProps) => {
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
-  const queryClient = new QueryClient();
+  const queryClient = useQueryClient();
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: () =>
