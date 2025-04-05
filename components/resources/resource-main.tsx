@@ -127,7 +127,9 @@ export const ResourceMain = () => {
         className="mx-auto max-w-2xl space-y-4 text-center"
       >
         <h1 className="text-3xl font-bold text-slate-900 capitalize dark:text-white">
-          {debouncedTab.category} Resources
+          {debouncedTab.category
+            ? `${debouncedTab.category} Resources`
+            : "Resources"}
         </h1>
         <p className="text-slate-600 dark:text-slate-300">
           Browse our curated collection of high-quality free coding resources
