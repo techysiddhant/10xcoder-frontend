@@ -126,8 +126,10 @@ export const ResourceMain = () => {
         variants={itemVariants}
         className="mx-auto max-w-2xl space-y-4 text-center"
       >
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-          Resources
+        <h1 className="text-3xl font-bold text-slate-900 capitalize dark:text-white">
+          {debouncedTab.category
+            ? `${debouncedTab.category} Resources`
+            : "Resources"}
         </h1>
         <p className="text-slate-600 dark:text-slate-300">
           Browse our curated collection of high-quality free coding resources
@@ -187,31 +189,33 @@ export const ResourceMain = () => {
             </div>
 
             {/* Tags Selection */}
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <ResourcesTags
-                initialTags={tags?.map((tag: TagType) => tag.name) ?? []}
-                selectedTags={tab.tags ? tab.tags.split(",") : []}
-                handleTagsClick={(checked, tag) => {
-                  setTab((prev) => {
-                    const currentTags = prev.tags ? prev.tags.split(",") : [];
-                    const updatedTags = checked
-                      ? [...currentTags, tag]
-                      : currentTags.filter((t) => t !== tag);
-                    return {
-                      ...prev,
-                      tags: updatedTags.length
-                        ? updatedTags.join(",")
-                        : undefined,
-                    };
-                  });
-                }}
-              />
+            <div className="flex flex-col items-center justify-center gap-3">
+              <div>
+                <ResourcesTags
+                  initialTags={tags?.map((tag: TagType) => tag.name) ?? []}
+                  selectedTags={tab.tags ? tab.tags.split(",") : []}
+                  handleTagsClick={(checked, tag) => {
+                    setTab((prev) => {
+                      const currentTags = prev.tags ? prev.tags.split(",") : [];
+                      const updatedTags = checked
+                        ? [...currentTags, tag]
+                        : currentTags.filter((t) => t !== tag);
+                      return {
+                        ...prev,
+                        tags: updatedTags.length
+                          ? updatedTags.join(",")
+                          : undefined,
+                      };
+                    });
+                  }}
+                />
+              </div>
 
               {/* Clear All Button (Shown Only if Tags are Selected) */}
               {tab.tags && (
                 <Button
                   onClick={clearAllTags}
-                  variant="destructive"
+                  variant="secondary"
                   size="sm"
                   className="rounded-full text-sm"
                 >

@@ -5,11 +5,12 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { motion } from "framer-motion";
-import { BookOpen, MenuIcon, X } from "lucide-react";
+import { MenuIcon, X } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSession } from "@/hooks/use-session";
 
+import Logo from "./logo";
 import { ProfileMenu } from "./profile-menu";
 import { ThemeToggler } from "./theme-toggler";
 import { Button } from "./ui/button";
@@ -17,7 +18,6 @@ import { Button } from "./ui/button";
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "Resources", path: "/resources" },
-  { name: "Categories", path: "/categories" },
   { name: "Submit", path: "/submit" },
   { name: "About", path: "/about" },
 ];
@@ -100,7 +100,7 @@ export const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <BookOpen className="text-primary size-6" />
+              <Logo />
               <span className="font-display text-xl font-bold text-slate-900 dark:text-white">
                 no-name
               </span>
