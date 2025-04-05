@@ -7,10 +7,9 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import queryString from "query-string";
 
-import { env } from "@/env";
 import { useDebounce } from "@/hooks/use-debounce";
-import { fetchData } from "@/lib/fetch-utils";
-import { CategoryType, ResourceType, TagType } from "@/lib/types";
+import { getCategories, getResources, getTags } from "@/lib/http";
+import { CategoryType, TagType } from "@/lib/types";
 
 import { Button } from "../ui/button";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
@@ -62,19 +61,35 @@ export const ResourceMain = () => {
   // Fetch Data
   const { data: tags } = useQuery({
     queryKey: ["tags"],
-    queryFn: () => fetchData<TagType[]>(`${env.NEXT_PUBLIC_API_URL}/tags`),
+    queryFn: async () => {
+      return getTags().then((res) => res.data);
+    },
   });
   const { data: categories } = useQuery({
     queryKey: ["categories"],
-    queryFn: () =>
-      fetchData<CategoryType[]>(`${env.NEXT_PUBLIC_API_URL}/categories`),
+    queryFn: async () => {
+      return getCategories().then((res) => res.data);
+    },
   });
   const { data: resources } = useQuery({
     queryKey: ["resources", debouncedTab], // 🔹 Use debouncedTab here
-    queryFn: () =>
-      fetchData<ResourceType[]>(
-        `${env.NEXT_PUBLIC_API_URL}/resources?${debouncedTab.resourceType ? `type=${debouncedTab.resourceType}` : ""}&${debouncedTab.category ? `category=${debouncedTab.category}` : ""}&${debouncedTab.tags ? `tags=${debouncedTab.tags}` : ""}`
-      ),
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      console.log(params);
+      if (debouncedTab.resourceType) {
+        params.append("type", debouncedTab.resourceType);
+      }
+      if (debouncedTab.category) {
+        params.append("category", debouncedTab.category);
+      }
+      if (debouncedTab.tags) {
+        params.append("tags", debouncedTab.tags);
+      }
+      if (debouncedTab.q) {
+        params.append("q", debouncedTab.q);
+      }
+      return getResources(params.toString()).then((res) => res.data);
+    },
     enabled: !!debouncedTab,
   });
 
@@ -125,7 +140,7 @@ export const ResourceMain = () => {
         variants={itemVariants}
         className="flex flex-wrap justify-center gap-2"
       >
-        {categories?.map((category) => (
+        {categories?.map((category: CategoryType) => (
           <Button
             key={category.id}
             onClick={() => updateFilters({ category: category.name })}
@@ -175,7 +190,7 @@ export const ResourceMain = () => {
             {/* Tags Selection */}
             <div className="flex flex-wrap items-center justify-center gap-3">
               <ResourcesTags
-                initialTags={tags?.map((tag) => tag.name) ?? []}
+                initialTags={tags?.map((tag: TagType) => tag.name) ?? []}
                 selectedTags={tab.tags ? tab.tags.split(",") : []}
                 handleTagsClick={(checked, tag) => {
                   setTab((prev) => {
