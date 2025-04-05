@@ -4,9 +4,20 @@ import { motion } from "framer-motion";
 
 import { SubmitResourceForm } from "./submit-resource-form";
 
+// import { useSearchParams } from "next/navigation";
+// import { useQuery } from "@tanstack/react-query";
+// import { getResource } from "@/lib/http";
+
 export const SubmitMain = () => {
+  // const searchParams = useSearchParams();
+  // const resourceId = searchParams.get("resourceId");
+  // const { data: initailData, isLoading, isError } = useQuery({
+  //     queryKey: [resourceId],
+  //     queryFn: () => getResource(resourceId as string),
+  //     enabled: !!resourceId,
+  // });
   return (
-    <div className="container mx-auto px-4 pt-24 pb-16">
+    <div className="container mx-auto px-4 pb-16">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

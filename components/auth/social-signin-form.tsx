@@ -1,20 +1,27 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { Github, Mail } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { env } from "@/env";
+import { useSession } from "@/hooks/use-session";
 import { signIn } from "@/lib/auth-client";
 
 import { Button } from "../ui/button";
 
 export const SocialSigninForm = () => {
+  const { data: session } = useSession();
+
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const callback = searchParams.get("callbackUrl");
+  if (session && session.user) {
+    router.push(callback ? callback : "/");
+  }
   const handleSocialSignUp = async (provider: string) => {
     try {
       setIsLoading(true);

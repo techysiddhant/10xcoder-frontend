@@ -6,7 +6,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Check, Image, Upload, X } from "lucide-react";
+import { Image, Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -54,8 +54,6 @@ const formVariants = {
 };
 type FormValues = z.infer<typeof submitResourceSchema>;
 export const SubmitResourceForm = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -74,18 +72,24 @@ export const SubmitResourceForm = () => {
       tags: "",
     },
   });
+  const clearThumbnail = () => {
+    form.setValue("image", undefined);
+    setThumbnailPreview(null);
+
+    // Clear the file input
+    const fileInput = document.getElementById("thumbnail") as HTMLInputElement;
+    if (fileInput) fileInput.value = "";
+  };
   const mutation = useMutation({
-    mutationFn: async (data: FormData) => createResource(data),
-    // postForm(
-    // `${env.NEXT_PUBLIC_API_URL}/resources`, {
-    // method: "POST",
-    // body: data,
-    // headers: {
-    //     "Content-Type": "multipart/form-data",
-    //     credentials: 'include'
-    // },
-    // credentials: 'include'
-    // })
+    mutationFn: async (data: FormValues) => createResource(data),
+    onError: (error) => {
+      toast.error("Failed to submit resource. Please try again.");
+    },
+    onSuccess: () => {
+      form.reset();
+      clearThumbnail();
+      toast.success("Resource submitted successfully!");
+    },
   });
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -99,12 +103,6 @@ export const SubmitResourceForm = () => {
         toast.error(
           "Invalid file type jpeg, jpg, or png. Please upload an image."
         );
-
-        // toast({
-        //   title: "Invalid file type",
-        //   description: "Please upload an image file",
-        //   variant: "destructive",
-        // });
         return;
       }
 
@@ -112,11 +110,6 @@ export const SubmitResourceForm = () => {
       const maxSize = 2 * 1024 * 1024;
       if (file.size > maxSize) {
         toast.error("File too large. Maximum size is 2MB.");
-        // toast({
-        //   title: "File too large",
-        //   description: "Image must be less than 5MB",
-        //   variant: "destructive",
-        // });
         return;
       }
 
@@ -131,41 +124,9 @@ export const SubmitResourceForm = () => {
       reader.readAsDataURL(file);
     }
   };
-  const clearThumbnail = () => {
-    form.setValue("image", undefined);
-    setThumbnailPreview(null);
 
-    // Clear the file input
-    const fileInput = document.getElementById("thumbnail") as HTMLInputElement;
-    if (fileInput) fileInput.value = "";
-  };
   const onSubmit = async (data: FormValues) => {
-    console.log("Form data:", data);
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("description", data.description);
-    formData.append("url", data.url);
-    formData.append("resourceType", data.resourceType);
-    formData.append("categoryName", data.categoryName);
-    formData.append("tags", data.tags);
-    if (data.image) {
-      formData.append("image", data.image);
-    }
-    setIsSubmitting(true);
-
-    try {
-      console.log(Object.fromEntries(formData.entries()));
-      await mutation.mutateAsync(formData);
-      setIsSuccess(true);
-      toast.success("Resource submitted successfully!");
-      form.reset();
-      clearThumbnail();
-    } catch (error) {
-      console.error("Error submitting resource:", error);
-      toast.error("Failed to submit resource. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    mutation.mutate(data);
   };
   return (
     <motion.div
@@ -390,24 +351,11 @@ export const SubmitResourceForm = () => {
               />
 
               <CardFooter className="flex justify-end px-0">
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || isSuccess}
-                  className={`flex w-full items-center sm:w-auto ${
-                    isSuccess
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-blue-600 hover:bg-blue-700"
-                  } text-white`}
-                >
-                  {isSubmitting ? (
+                <Button type="submit" disabled={mutation.isPending}>
+                  {mutation.isPending ? (
                     <>
                       <span className="mr-2">Submitting...</span>
                       <div className="border-opacity-50 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    </>
-                  ) : isSuccess ? (
-                    <>
-                      <Check size={18} className="mr-2" />
-                      <span>Submitted!</span>
                     </>
                   ) : (
                     <>
