@@ -21,6 +21,7 @@ export const SocialSigninForm = () => {
   const callback = searchParams.get("callbackUrl");
   if (session && session.user) {
     router.push(callback ? callback : "/");
+    return null;
   }
   const handleSocialSignUp = async (provider: string) => {
     try {

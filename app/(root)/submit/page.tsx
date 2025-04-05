@@ -21,6 +21,7 @@ const ResourceSubmitPage = () => {
   }
   if (!session || !session.user) {
     router.push("/signin?callbackUrl=/submit");
+    return null;
   }
   return (
     <Suspense

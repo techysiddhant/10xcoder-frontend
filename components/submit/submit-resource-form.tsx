@@ -92,7 +92,7 @@ export const SubmitResourceForm = () => {
     },
   });
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files && e.target.files?.[0]) {
       const file = e.target.files[0];
 
       // Check file type
@@ -106,7 +106,7 @@ export const SubmitResourceForm = () => {
         return;
       }
 
-      // Check file size (max 5MB)
+      // Check file size (max 2MB)
       const maxSize = 2 * 1024 * 1024;
       if (file.size > maxSize) {
         toast.error("File too large. Maximum size is 2MB.");
