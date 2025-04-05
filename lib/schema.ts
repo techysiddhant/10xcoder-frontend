@@ -39,3 +39,16 @@ export const resetPasswordSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+export const submitResourceSchema = z.object({
+  title: z.string().min(5, { message: "Title must be at least 5 characters" }),
+  description: z
+    .string()
+    .min(20, { message: "Description must be at least 20 characters" }),
+  url: z.string().url({ message: "Please enter a valid URL" }),
+  resourceType: z.enum(["video", "article"]),
+  categoryName: z.string({ required_error: "Please select a category" }),
+  tags: z.string().min(1, {
+    message: "Please select at least one tag",
+  }),
+  image: z.instanceof(File).optional(),
+});
