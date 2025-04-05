@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { LogOut, Settings, User } from "lucide-react";
+import { FileText, LogOut, User } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -48,18 +48,26 @@ export const ProfileMenu = () => {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel className="flex flex-col items-start">
+          <span className="text-sm font-medium capitalize">{user?.name}</span>
+          <span className="text-muted-foreground text-xs">{user?.email}</span>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => router.push("/profile")}>
           <User />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push("/settings")}>
-          <Settings />
-          <span>Settings</span>
+        <DropdownMenuItem onClick={() => router.push("/submissions")}>
+          <FileText />
+          <span>My Submissions</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleSignOut} disabled={isSigningOut}>
-          <LogOut />
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="text-red-500"
+          onClick={handleSignOut}
+          disabled={isSigningOut}
+        >
+          <LogOut className="text-red-500" />
           <span>{isSigningOut ? "Signing out..." : "Sign out"}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

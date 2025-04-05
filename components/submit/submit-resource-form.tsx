@@ -1,10 +1,10 @@
 "use client";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Image, Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -40,9 +40,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { env } from "@/env";
 import { fetchData } from "@/lib/fetch-utils";
-import { createResource } from "@/lib/http";
+import { createResource, updateResource } from "@/lib/http";
 import { submitResourceSchema } from "@/lib/schema";
-import { CategoryType } from "@/lib/types";
+import { CategoryType, ResourceType } from "@/lib/types";
 
 const formVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -53,8 +53,14 @@ const formVariants = {
   },
 };
 type FormValues = z.infer<typeof submitResourceSchema>;
-export const SubmitResourceForm = () => {
+interface SubmitResourceFormProps {
+  initialData: ResourceType | null;
+}
+export const SubmitResourceForm = ({
+  initialData,
+}: SubmitResourceFormProps) => {
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const queryClient = new QueryClient();
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: () =>
@@ -72,6 +78,21 @@ export const SubmitResourceForm = () => {
       tags: "",
     },
   });
+  useEffect(() => {
+    if (initialData && categories?.length) {
+      form.setValue("title", initialData.title);
+      form.setValue("description", initialData?.description || "");
+      form.setValue("url", initialData.url);
+      form.setValue("resourceType", initialData.resourceType);
+      form.setValue("tags", initialData.tags.join(","));
+      form.setValue("categoryName", initialData.categoryName);
+      if (initialData.image) {
+        setThumbnailPreview(
+          `${env.NEXT_PUBLIC_API_URL}/resources/${initialData.image}`
+        );
+      }
+    }
+  }, [initialData, categories]);
   const clearThumbnail = () => {
     form.setValue("image", undefined);
     setThumbnailPreview(null);
@@ -89,6 +110,21 @@ export const SubmitResourceForm = () => {
       form.reset();
       clearThumbnail();
       toast.success("Resource submitted successfully!");
+    },
+  });
+  const mutateR = useMutation({
+    mutationFn: async (data: FormValues) =>
+      updateResource(data, initialData?.id as string),
+    onError: (error) => {
+      toast.error("Failed to update resource. Please try again.");
+    },
+    onSuccess: () => {
+      form.reset();
+      clearThumbnail();
+      toast.success("Resource updated successfully!");
+      queryClient.invalidateQueries({
+        queryKey: ["user-resources"],
+      });
     },
   });
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,6 +162,10 @@ export const SubmitResourceForm = () => {
   };
 
   const onSubmit = async (data: FormValues) => {
+    if (initialData) {
+      mutateR.mutate(data);
+      return;
+    }
     mutation.mutate(data);
   };
   return (
@@ -244,14 +284,14 @@ export const SubmitResourceForm = () => {
                       <FormLabel>Category</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
                       >
                         <FormControl className="w-full">
                           <SelectTrigger>
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent defaultValue={field.value}>
                           {categories?.map((category) => (
                             <SelectItem key={category.id} value={category.name}>
                               {category.name}
@@ -351,8 +391,11 @@ export const SubmitResourceForm = () => {
               />
 
               <CardFooter className="flex justify-end px-0">
-                <Button type="submit" disabled={mutation.isPending}>
-                  {mutation.isPending ? (
+                <Button
+                  type="submit"
+                  disabled={mutation.isPending || mutateR.isPending}
+                >
+                  {mutation.isPending || mutateR.isPending ? (
                     <>
                       <span className="mr-2">Submitting...</span>
                       <div className="border-opacity-50 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -360,7 +403,9 @@ export const SubmitResourceForm = () => {
                   ) : (
                     <>
                       <Upload size={18} className="mr-2" />
-                      <span>Submit Resource</span>
+                      <span>
+                        {initialData ? "Update Resource" : "Submit Resource"}
+                      </span>
                     </>
                   )}
                 </Button>

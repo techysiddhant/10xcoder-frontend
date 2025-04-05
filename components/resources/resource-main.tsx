@@ -75,7 +75,6 @@ export const ResourceMain = () => {
     queryKey: ["resources", debouncedTab], // 🔹 Use debouncedTab here
     queryFn: async () => {
       const params = new URLSearchParams();
-      console.log(params);
       if (debouncedTab.resourceType) {
         params.append("type", debouncedTab.resourceType);
       }

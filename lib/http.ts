@@ -9,7 +9,7 @@ export const createResource = (formData: unknown) =>
   });
 
 export const getResource = (resourceId: string) =>
-  api.get(`/resources/${resourceId}`, {
+  api.get(`/resource/${resourceId}`, {
     withCredentials: true,
   });
 export const getResources = (queryString: string) =>
@@ -23,5 +23,17 @@ export const getCategories = () =>
   });
 export const getTags = () =>
   api.get("/tags", {
+    withCredentials: true,
+  });
+export const getUserResources = () =>
+  api.get("/user/resources", {
+    withCredentials: true,
+  });
+
+export const updateResource = (formData: unknown, resourceId: string) =>
+  api.patch(`/resource/${resourceId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
     withCredentials: true,
   });
