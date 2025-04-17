@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Image, Upload, X } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -44,6 +44,8 @@ import { createResource, updateResource } from "@/lib/http";
 import { submitResourceSchema } from "@/lib/schema";
 import { CategoryType, ResourceType } from "@/lib/types";
 
+import { UploadDropzone } from "../upload-button";
+
 const formVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -59,6 +61,7 @@ interface SubmitResourceFormProps {
 export const SubmitResourceForm = ({
   initialData,
 }: SubmitResourceFormProps) => {
+  const [imageUploading, setImageUploading] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { data: categories } = useQuery({
@@ -87,19 +90,13 @@ export const SubmitResourceForm = ({
       form.setValue("tags", initialData.tags.join(","));
       form.setValue("categoryName", initialData.categoryName);
       if (initialData.image) {
-        setThumbnailPreview(
-          `${env.NEXT_PUBLIC_API_URL}/resources/${initialData.image}`
-        );
+        setThumbnailPreview(initialData.image);
       }
     }
   }, [initialData, categories]);
   const clearThumbnail = () => {
     form.setValue("image", undefined);
     setThumbnailPreview(null);
-
-    // Clear the file input
-    const fileInput = document.getElementById("thumbnail") as HTMLInputElement;
-    if (fileInput) fileInput.value = "";
   };
   const mutation = useMutation({
     mutationFn: async (data: FormValues) => createResource(data),
@@ -127,39 +124,6 @@ export const SubmitResourceForm = ({
       });
     },
   });
-  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files?.[0]) {
-      const file = e.target.files[0];
-
-      // Check file type
-      if (
-        !file.type.startsWith("image/") ||
-        !file.type.match(/image\/(jpeg|jpg|png)/)
-      ) {
-        toast.error(
-          "Invalid file type jpeg, jpg, or png. Please upload an image."
-        );
-        return;
-      }
-
-      // Check file size (max 2MB)
-      const maxSize = 2 * 1024 * 1024;
-      if (file.size > maxSize) {
-        toast.error("File too large. Maximum size is 2MB.");
-        return;
-      }
-
-      // Set the file in form data
-      form.setValue("image", file);
-
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setThumbnailPreview(event.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const onSubmit = async (data: FormValues) => {
     if (initialData) {
@@ -340,7 +304,7 @@ export const SubmitResourceForm = ({
                           <img
                             src={thumbnailPreview}
                             alt="Thumbnail preview"
-                            className="h-48 w-full rounded-md border object-cover"
+                            className="aspect-video w-full rounded-md border object-cover"
                           />
                           <Button
                             type="button"
@@ -354,31 +318,22 @@ export const SubmitResourceForm = ({
                         </div>
                       ) : (
                         <div className="flex w-full items-center justify-center">
-                          <label
-                            htmlFor="thumbnail"
-                            className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-800"
-                          >
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <Image className="mb-3 h-10 w-10 text-gray-400" />
-                              <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                                <span className="font-semibold">
-                                  Click to upload
-                                </span>{" "}
-                                or drag and drop
-                              </p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                PNG, JPG or GIF (Max 5MB)
-                              </p>
-                            </div>
-                            <input
-                              id="thumbnail"
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={handleThumbnailChange}
-                              {...field}
-                            />
-                          </label>
+                          <UploadDropzone
+                            className="w-full"
+                            endpoint={"imageUploader"}
+                            onUploadBegin={() => {
+                              setImageUploading(true);
+                            }}
+                            onClientUploadComplete={(res) => {
+                              setImageUploading(false);
+                              onChange(res[0].ufsUrl);
+                              toast.success("Thumbnail uploaded successfully!");
+                              setThumbnailPreview(res[0].ufsUrl);
+                            }}
+                            onUploadError={(error: Error) => {
+                              toast.error(`ERROR! ${error.message}`);
+                            }}
+                          />
                         </div>
                       )}
                     </div>
@@ -393,11 +348,15 @@ export const SubmitResourceForm = ({
               <CardFooter className="flex justify-end px-0">
                 <Button
                   type="submit"
-                  disabled={mutation.isPending || mutateR.isPending}
+                  disabled={
+                    mutation.isPending || mutateR.isPending || imageUploading
+                  }
                 >
-                  {mutation.isPending || mutateR.isPending ? (
+                  {mutation.isPending || mutateR.isPending || imageUploading ? (
                     <>
-                      <span className="mr-2">Submitting...</span>
+                      <span className="mr-2">
+                        {imageUploading ? "Uploading..." : "Submitting..."}
+                      </span>
                       <div className="border-opacity-50 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     </>
                   ) : (
