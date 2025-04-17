@@ -50,5 +50,5 @@ export const submitResourceSchema = z.object({
   tags: z.string().min(1, {
     message: "Please select at least one tag",
   }),
-  image: z.instanceof(File).optional(),
+  image: z.string().url().optional(),
 });

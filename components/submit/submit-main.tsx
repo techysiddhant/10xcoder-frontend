@@ -44,7 +44,6 @@ export const SubmitMain = () => {
             Share your favorite free developer resources with the community
           </p>
         </div>
-
         <SubmitResourceForm initialData={initailData} />
       </motion.div>
     </div>
