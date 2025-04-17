@@ -326,11 +326,20 @@ export const SubmitResourceForm = ({
                             }}
                             onClientUploadComplete={(res) => {
                               setImageUploading(false);
-                              onChange(res[0].ufsUrl);
-                              toast.success("Thumbnail uploaded successfully!");
-                              setThumbnailPreview(res[0].ufsUrl);
+                              if (res && res.length > 0) {
+                                onChange(res[0].ufsUrl);
+                                toast.success(
+                                  "Thumbnail uploaded successfully!"
+                                );
+                                setThumbnailPreview(res[0].ufsUrl);
+                              } else {
+                                toast.error(
+                                  "Upload failed: No response received"
+                                );
+                              }
                             }}
                             onUploadError={(error: Error) => {
+                              setImageUploading(false);
                               toast.error(`ERROR! ${error.message}`);
                             }}
                           />

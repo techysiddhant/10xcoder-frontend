@@ -44,19 +44,6 @@ export const SubmitMain = () => {
             Share your favorite free developer resources with the community
           </p>
         </div>
-        {/* <div className="p-20 border">
-          <UploadButton endpoint="imageUploader"
-            onClientUploadComplete={(res) => {
-              // Do something with the response
-              console.log("Files: ", res);
-              alert("Upload Completed");
-            }}
-            onUploadError={(error: Error) => {
-              // Do something with the error.
-              alert(`ERROR! ${error.message}`);
-            }}
-          />
-        </div> */}
         <SubmitResourceForm initialData={initailData} />
       </motion.div>
     </div>
