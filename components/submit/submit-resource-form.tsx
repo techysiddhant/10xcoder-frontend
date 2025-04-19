@@ -69,7 +69,6 @@ export const SubmitResourceForm = ({
     queryFn: () =>
       fetchData<CategoryType[]>(`${env.NEXT_PUBLIC_API_URL}/categories`),
   });
-
   const form = useForm<FormValues>({
     resolver: zodResolver(submitResourceSchema),
     defaultValues: {
@@ -77,8 +76,9 @@ export const SubmitResourceForm = ({
       description: "",
       url: "",
       resourceType: "video",
-      categoryName: "",
+      categoryId: "",
       tags: "",
+      language: "english",
     },
   });
   useEffect(() => {
@@ -88,7 +88,8 @@ export const SubmitResourceForm = ({
       form.setValue("url", initialData.url);
       form.setValue("resourceType", initialData.resourceType);
       form.setValue("tags", initialData.tags.join(","));
-      form.setValue("categoryName", initialData.categoryName);
+      form.setValue("categoryId", initialData.categoryName);
+      form.setValue("language", initialData.language);
       if (initialData.image) {
         setThumbnailPreview(initialData.image);
       }
@@ -139,7 +140,7 @@ export const SubmitResourceForm = ({
       animate="visible"
       className="mx-auto max-w-2xl"
     >
-      <Card className="glass-card">
+      <Card className="bg-card">
         <CardHeader>
           <CardTitle className="text-2xl">Submit a Resource</CardTitle>
           <CardDescription>
@@ -149,6 +150,69 @@ export const SubmitResourceForm = ({
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="resourceType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Resource Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl className="w-full">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="video">Video</SelectItem>
+                          <SelectItem value="article">Article</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        What type of resource is this?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="categoryId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl className="w-full">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent defaultValue={field.value}>
+                          {categories?.map((category) => (
+                            <SelectItem
+                              key={category.id}
+                              value={String(category.id)}
+                            >
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Which category best fits this resource?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <FormField
                 control={form.control}
                 name="title"
@@ -211,67 +275,33 @@ export const SubmitResourceForm = ({
                 )}
               />
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="resourceType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Resource Type</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl className="w-full">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="video">Video</SelectItem>
-                          <SelectItem value="article">Article</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        What type of resource is this?
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="categoryName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl className="w-full">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent defaultValue={field.value}>
-                          {categories?.map((category) => (
-                            <SelectItem key={category.id} value={category.name}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        Which category best fits this resource?
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
+              <FormField
+                control={form.control}
+                name="language"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Resource Language</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl className="w-full">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a language" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="english">English</SelectItem>
+                        <SelectItem value="hindi">Hindi</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      What is the language of this resource?
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="tags"
@@ -319,7 +349,7 @@ export const SubmitResourceForm = ({
                       ) : (
                         <div className="flex w-full items-center justify-center">
                           <UploadDropzone
-                            className="w-full"
+                            className="ut-button:bg-primary w-full"
                             endpoint={"imageUploader"}
                             onUploadBegin={() => {
                               setImageUploading(true);
@@ -356,6 +386,7 @@ export const SubmitResourceForm = ({
 
               <CardFooter className="flex justify-end px-0">
                 <Button
+                  className="text-secondary dark:text-secondary-foreground"
                   type="submit"
                   disabled={
                     mutation.isPending || mutateR.isPending || imageUploading

@@ -92,6 +92,9 @@ importers:
       react-hot-toast:
         specifier: ^2.5.2
         version: 2.5.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      react-scroll-to-top:
+        specifier: ^3.1.0
+        version: 3.1.0(react@19.0.0)
       tailwind-merge:
         specifier: ^3.0.2
         version: 3.0.2
@@ -2768,6 +2771,11 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  react-scroll-to-top@3.1.0:
+    resolution: {integrity: sha512-hD3bJQgCblywG2gcI515BcxP43MZkBidsYEVt9ak5pu1UOoQDJzIJp89zwccbpFuqeHZ29Lxs00T9DSxQr4cmw==}
+    peerDependencies:
+      react: ^16.8.0 || 17.x || ^18 || ^19
 
   react-style-singleton@2.2.3:
     resolution: {integrity: sha512-b6jSvxvVnyptAiLjbkWLE/lOnR4lfTtDAl+eUC7RZy+QQWc6wRzIV2CE6xBuMmDxc2qIihtDCZD5NPOFl7fRBQ==}
@@ -5870,6 +5878,10 @@ snapshots:
       use-sidecar: 1.1.3(@types/react@19.0.11)(react@19.0.0)
     optionalDependencies:
       '@types/react': 19.0.11
+
+  react-scroll-to-top@3.1.0(react@19.0.0):
+    dependencies:
+      react: 19.0.0
 
   react-style-singleton@2.2.3(@types/react@19.0.11)(react@19.0.0):
     dependencies:

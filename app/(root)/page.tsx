@@ -1,3 +1,4 @@
+import { Footer } from "@/components/footer";
 import { Categories } from "@/components/home/categories";
 import { Cta } from "@/components/home/cta";
 import { Features } from "@/components/home/features";
@@ -10,6 +11,7 @@ const HomePage = () => {
       <Features />
       <Categories />
       <Cta />
+      <Footer />
     </>
   );
 };

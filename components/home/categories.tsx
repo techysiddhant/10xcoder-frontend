@@ -65,11 +65,11 @@ export const Categories = () => {
           ].map((category, i) => (
             <motion.div
               key={i}
-              className="glass-card p-5 transition-all hover:-translate-y-1 hover:shadow-md"
+              className="bg-card rounded-xl border p-5 transition-all hover:-translate-y-1 hover:shadow-md"
               variants={fadeIn}
               onClick={() => router.push(`/resources?category=${category.tag}`)}
             >
-              <div className="mb-3 flex size-10 items-center justify-center rounded-md bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+              <div className="bg-secondary text-primary dark:bg-secondary dark:text-primary mb-3 flex size-10 items-center justify-center rounded-md">
                 {category.icon}
               </div>
               <h3 className="font-semibold">{category.name}</h3>

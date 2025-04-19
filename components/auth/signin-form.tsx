@@ -102,7 +102,7 @@ export const SigninForm = () => {
                 <FormLabel>Password</FormLabel>
                 <Link
                   href="/forgot-password"
-                  className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                  className="text-primary text-sm font-medium dark:hover:text-yellow-300"
                 >
                   Forgot password?
                 </Link>
@@ -124,7 +124,11 @@ export const SigninForm = () => {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button
+          type="submit"
+          className="text-secondary dark:text-secondary-foreground w-full"
+          disabled={isLoading}
+        >
           {isLoading ? (
             <>
               <span className="mr-2">Signing In...</span>

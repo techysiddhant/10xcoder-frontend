@@ -22,4 +22,5 @@ export type ResourceType = {
   description: string | null;
   upvoteCount: number;
   userId: string;
+  language: "hindi" | "english";
 };
