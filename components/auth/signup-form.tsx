@@ -135,7 +135,7 @@ export const SignupForm = () => {
         <Button
           type="submit"
           variant={"default"}
-          className="w-full"
+          className="text-secondary dark:text-secondary-foreground w-full"
           disabled={isLoading || isSuccess}
         >
           {isLoading ? (

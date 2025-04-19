@@ -18,7 +18,7 @@ import { useSession } from "@/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
 
 export const ProfileMenu = () => {
-  const { data: session } = useSession();
+  const { data: session, refetch } = useSession();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const user = session?.user;
   const router = useRouter();
@@ -29,6 +29,7 @@ export const ProfileMenu = () => {
         onSuccess: () => {
           setIsSigningOut(false);
           router.push("/");
+          refetch();
         },
       },
     });

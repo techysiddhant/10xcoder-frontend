@@ -89,9 +89,9 @@ export const Navbar = () => {
     <motion.nav
       className={`fixed top-0 right-0 left-0 z-50 ${
         isScrolled
-          ? "bg-white/80 shadow-sm backdrop-blur-md dark:bg-slate-900/80"
+          ? "border-secondary border-b shadow-sm backdrop-blur-md"
           : "bg-transparent"
-      } transition-all duration-300`}
+      } inset-x-0 transition-all duration-300`}
       initial="hidden"
       animate="visible"
       variants={navbarVariants}
@@ -118,8 +118,8 @@ export const Navbar = () => {
                       href={link.path}
                       className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                         pathname === link.path
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-slate-700 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400"
+                          ? "text-primary"
+                          : "hover:text-primary dark:hover:text-yellow-400"
                       }`}
                     >
                       {link.name}
@@ -135,7 +135,7 @@ export const Navbar = () => {
                   <Button asChild variant={"outline"}>
                     <Link href="/signin">Sign in</Link>
                   </Button>
-                  <Button asChild>
+                  <Button asChild className="text-secondary">
                     <Link href="/signup">Sign Up</Link>
                   </Button>
                 </div>
@@ -147,7 +147,7 @@ export const Navbar = () => {
             <div className="flex items-center space-x-2 lg:hidden">
               <ThemeToggler />
               {!user ? (
-                <Button asChild size={"sm"}>
+                <Button asChild size={"sm"} className="text-secondary">
                   <Link href="/signup">Get Started</Link>
                 </Button>
               ) : (
@@ -173,7 +173,7 @@ export const Navbar = () => {
           animate={mobileMenuOpen ? "visible" : "hidden"}
           variants={mobileMenuVariants}
         >
-          <div className="space-y-1 bg-white/95 px-2 pt-2 pb-3 shadow-lg backdrop-blur-md dark:bg-slate-900/95">
+          <div className="bg-card dark:bg-card space-y-1 px-2 pt-2 pb-3 shadow-lg backdrop-blur-md">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -181,8 +181,8 @@ export const Navbar = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`block rounded-md px-3 py-3 text-base font-medium ${
                   pathname === link.path
-                    ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
-                    : "text-slate-700 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400"
+                    ? "text-primary dark:text-primary bg-amber-100/50 dark:bg-amber-900/20"
+                    : "text-primary-foreground dark:text-secondary-foreground dark:hover:text-yellow-400"
                 }`}
               >
                 {link.name}

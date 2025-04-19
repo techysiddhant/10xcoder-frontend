@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, CheckCircle, Mail } from "lucide-react";
+import { ArrowRight, CheckCircle, CircleArrowLeft, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -63,7 +63,10 @@ export const ForgotPasswordForm = () => {
             </p>
           </div>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="mt-4 space-y-4"
+            >
               <FormField
                 control={form.control}
                 name="email"
@@ -87,7 +90,11 @@ export const ForgotPasswordForm = () => {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="text-secondary dark:text-secondary-foreground w-full"
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <>
                     <span className="mr-2">Sending...</span>
@@ -102,11 +109,12 @@ export const ForgotPasswordForm = () => {
               </Button>
             </form>
           </Form>
-          <div className="text-center text-sm">
+          <div className="mt-4 text-center text-sm">
             <Link
               href="/signin"
-              className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+              className="flex items-center justify-center gap-2 font-medium"
             >
+              <CircleArrowLeft className="h-4 w-4" />
               Back to Sign In
             </Link>
           </div>

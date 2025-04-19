@@ -31,7 +31,7 @@ export const ResourcesTags = ({
     <div className="flex flex-col items-center justify-center">
       {/* Tags Dropdown */}
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex w-full max-w-96 items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-2 text-sm shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+        <DropdownMenuTrigger className="bg-card flex w-full max-w-96 items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm shadow-sm">
           <Tags className="size-5" />
           <span>Filter by Tags</span>
         </DropdownMenuTrigger>

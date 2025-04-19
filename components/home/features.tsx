@@ -7,7 +7,7 @@ import { fadeIn, staggerContainer } from "@/lib/animations";
 
 export const Features = () => {
   return (
-    <section className="bg-slate-50 py-16 dark:bg-slate-900/30">
+    <section className="py-16">
       <div className="container mx-auto px-4 md:px-6">
         <motion.div
           className="mx-auto mb-12 max-w-2xl text-center"
@@ -32,25 +32,19 @@ export const Features = () => {
         >
           {[
             {
-              icon: (
-                <BookOpen className="size-10 text-blue-600 dark:text-blue-400" />
-              ),
+              icon: <BookOpen className="text-primary size-10" />,
               title: "Curated Content",
               description:
                 "Hand-picked resources that are free, high-quality, and relevant to modern development.",
             },
             {
-              icon: (
-                <Zap className="size-10 text-blue-600 dark:text-blue-400" />
-              ),
+              icon: <Zap className="text-primary size-10" />,
               title: "Always Updated",
               description:
                 "Fresh content added regularly to keep up with the fast-evolving tech landscape.",
             },
             {
-              icon: (
-                <Users className="size-10 text-blue-600 dark:text-blue-400" />
-              ),
+              icon: <Users className="text-primary size-10" />,
               title: "Community Driven",
               description:
                 "Resources recommended by developers for developers, ensuring practical value.",
@@ -58,7 +52,7 @@ export const Features = () => {
           ].map((feature, i) => (
             <motion.div
               key={i}
-              className="glass-card p-6 text-center"
+              className="bg-card rounded-xl border p-6 text-center shadow-sm backdrop-blur-sm transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
               variants={fadeIn}
             >
               <div className="mb-4 flex justify-center">{feature.icon}</div>

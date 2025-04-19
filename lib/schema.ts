@@ -46,7 +46,8 @@ export const submitResourceSchema = z.object({
     .min(20, { message: "Description must be at least 20 characters" }),
   url: z.string().url({ message: "Please enter a valid URL" }),
   resourceType: z.enum(["video", "article"]),
-  categoryName: z.string({ required_error: "Please select a category" }),
+  categoryId: z.string({ required_error: "Please select a category" }),
+  language: z.enum(["hindi", "english"]),
   tags: z.string().min(1, {
     message: "Please select at least one tag",
   }),
