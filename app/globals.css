@@ -164,3 +164,9 @@
 .float {
   animation: float 4s ease-in-out infinite;
 }
+.masonry-column {
+  background-clip: padding-box;
+}
+.masonry-column > div {
+  margin-bottom: 1.5rem; /* Adjust space between cards */
+}

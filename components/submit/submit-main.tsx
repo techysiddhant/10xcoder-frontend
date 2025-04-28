@@ -38,7 +38,7 @@ export const SubmitMain = () => {
       >
         <div className="mb-12 text-center">
           <h1 className="font-display mb-4 text-4xl font-bold md:text-5xl">
-            {resourceId ? "Update" : "Submit"} a Resource
+            {resourceId ? "Update" : "Add"} a Resource
           </h1>
           <p className="text-muted-foreground mx-auto max-w-3xl text-lg">
             Share your favorite free developer resources with the community

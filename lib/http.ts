@@ -2,9 +2,6 @@ import { api } from "./api";
 
 export const createResource = (formData: unknown) =>
   api.post("/resources", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
     withCredentials: true,
   });
 
@@ -25,15 +22,12 @@ export const getTags = () =>
   api.get("/tags", {
     withCredentials: true,
   });
-export const getUserResources = () =>
-  api.get("/user/resources", {
+export const getUserResources = (queryString: string) =>
+  api.get(`/user/resources?${queryString}`, {
     withCredentials: true,
   });
 
 export const updateResource = (formData: unknown, resourceId: string) =>
   api.patch(`/resource/${resourceId}`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
     withCredentials: true,
   });

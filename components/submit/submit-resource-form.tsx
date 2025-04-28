@@ -1,6 +1,7 @@
 "use client";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +10,7 @@ import { motion } from "framer-motion";
 import { Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import PacmanLoader from "react-spinners/PacmanLoader";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -62,7 +64,9 @@ export const SubmitResourceForm = ({
   initialData,
 }: SubmitResourceFormProps) => {
   const [imageUploading, setImageUploading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -72,29 +76,50 @@ export const SubmitResourceForm = ({
   const form = useForm<FormValues>({
     resolver: zodResolver(submitResourceSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      url: "",
+      title: initialData?.title || "",
+      description: initialData?.description || "",
+      url: initialData?.url || "",
       resourceType: "video",
-      categoryId: "",
-      tags: "",
+      categoryId: initialData?.categoryId || "",
+      tags: initialData?.tags.join(",") ?? "",
       language: "english",
     },
   });
   useEffect(() => {
-    if (initialData && categories?.length) {
-      form.setValue("title", initialData.title);
-      form.setValue("description", initialData?.description || "");
-      form.setValue("url", initialData.url);
-      form.setValue("resourceType", initialData.resourceType);
-      form.setValue("tags", initialData.tags.join(","));
-      form.setValue("categoryId", initialData.categoryName);
-      form.setValue("language", initialData.language);
+    if (initialData && categories && categories.length > 0) {
       if (initialData.image) {
         setThumbnailPreview(initialData.image);
       }
     }
   }, [initialData, categories]);
+  const url = form.watch("url");
+  useEffect(() => {
+    if (!url) return;
+    const controller = new AbortController();
+    const fetchImage = async () => {
+      try {
+        setImageLoading(true);
+        const response = await fetch(
+          `https://api.microlink.io?url=${encodeURIComponent(url)}`,
+          { signal: controller.signal }
+        );
+        const data = await response.json();
+        if (data?.data?.image?.url) {
+          setThumbnailPreview(data.data.image.url);
+          form.setValue("image", data.data.image.url);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch image. based on URL.");
+      } finally {
+        setImageLoading(false);
+      }
+    };
+    if (!initialData) {
+      console.log("Fetching image based on URL...");
+      fetchImage();
+    }
+    return () => controller.abort();
+  }, [url]);
   const clearThumbnail = () => {
     form.setValue("image", undefined);
     setThumbnailPreview(null);
@@ -108,6 +133,7 @@ export const SubmitResourceForm = ({
       form.reset();
       clearThumbnail();
       toast.success("Resource submitted successfully!");
+      router.push("/submissions");
     },
   });
   const mutateR = useMutation({
@@ -150,6 +176,26 @@ export const SubmitResourceForm = ({
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Resource URL</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="https://example.com/resource"
+                        type="url"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Link to the original resource
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <FormField
                   control={form.control}
@@ -194,15 +240,21 @@ export const SubmitResourceForm = ({
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent defaultValue={field.value}>
-                          {categories?.map((category) => (
-                            <SelectItem
-                              key={category.id}
-                              value={String(category.id)}
-                            >
-                              {category.name}
-                            </SelectItem>
-                          ))}
+                        <SelectContent>
+                          {categories && categories.length > 0 ? (
+                            categories.map((category) => (
+                              <SelectItem
+                                key={category.id}
+                                value={String(category.id)}
+                              >
+                                {category.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <div className="text-muted-foreground px-4 py-2 text-sm">
+                              No categories found
+                            </div>
+                          )}
                         </SelectContent>
                       </Select>
                       <FormDescription>
@@ -253,28 +305,6 @@ export const SubmitResourceForm = ({
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Resource URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="https://example.com/resource"
-                        type="url"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Link to the original resource
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <FormField
                 control={form.control}
                 name="language"
@@ -321,94 +351,109 @@ export const SubmitResourceForm = ({
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="image"
-                render={({ field: { value, onChange, ...field } }) => (
-                  <FormItem>
-                    <FormLabel>Thumbnail Image</FormLabel>
-                    <div className="flex flex-col space-y-2">
-                      {thumbnailPreview ? (
-                        <div className="relative">
-                          <img
-                            src={thumbnailPreview}
-                            alt="Thumbnail preview"
-                            className="aspect-video w-full rounded-md border object-cover"
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute top-2 right-2 h-8 w-8 rounded-full"
-                            onClick={clearThumbnail}
-                          >
-                            <X size={16} />
-                          </Button>
+              {imageLoading ? (
+                <div className="flex h-40 items-center justify-center">
+                  <PacmanLoader color="#f59e0b" />
+                </div>
+              ) : (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="image"
+                    render={({ field: { value, onChange, ...field } }) => (
+                      <FormItem>
+                        <FormLabel>Thumbnail Image</FormLabel>
+                        <div className="flex flex-col space-y-2">
+                          {thumbnailPreview ? (
+                            <div className="relative">
+                              <img
+                                src={thumbnailPreview}
+                                alt="Thumbnail preview"
+                                className="aspect-video w-full rounded-md border object-cover"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-2 right-2 h-8 w-8 rounded-full"
+                                onClick={clearThumbnail}
+                              >
+                                <X size={16} />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex w-full items-center justify-center">
+                              <UploadDropzone
+                                disabled={imageLoading || imageUploading}
+                                className="ut-button:bg-primary w-full"
+                                endpoint={"imageUploader"}
+                                onUploadBegin={() => {
+                                  setImageUploading(true);
+                                }}
+                                onClientUploadComplete={(res) => {
+                                  setImageUploading(false);
+                                  if (res && res.length > 0) {
+                                    onChange(res[0].ufsUrl);
+                                    toast.success(
+                                      "Thumbnail uploaded successfully!"
+                                    );
+                                    setThumbnailPreview(res[0].ufsUrl);
+                                  } else {
+                                    toast.error(
+                                      "Upload failed: No response received"
+                                    );
+                                  }
+                                }}
+                                onUploadError={(error: Error) => {
+                                  setImageUploading(false);
+                                  toast.error(`ERROR! ${error.message}`);
+                                }}
+                              />
+                            </div>
+                          )}
                         </div>
+                        <FormDescription>
+                          Upload a thumbnail image for your resource
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <CardFooter className="flex justify-end px-0">
+                    <Button
+                      className="text-secondary dark:text-secondary-foreground"
+                      type="submit"
+                      disabled={
+                        mutation.isPending ||
+                        mutateR.isPending ||
+                        imageUploading ||
+                        imageLoading
+                      }
+                    >
+                      {mutation.isPending ||
+                      mutateR.isPending ||
+                      imageUploading ? (
+                        <>
+                          <span className="mr-2">
+                            {imageUploading ? "Uploading..." : "Submitting..."}
+                          </span>
+                          <div className="border-opacity-50 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        </>
                       ) : (
-                        <div className="flex w-full items-center justify-center">
-                          <UploadDropzone
-                            className="ut-button:bg-primary w-full"
-                            endpoint={"imageUploader"}
-                            onUploadBegin={() => {
-                              setImageUploading(true);
-                            }}
-                            onClientUploadComplete={(res) => {
-                              setImageUploading(false);
-                              if (res && res.length > 0) {
-                                onChange(res[0].ufsUrl);
-                                toast.success(
-                                  "Thumbnail uploaded successfully!"
-                                );
-                                setThumbnailPreview(res[0].ufsUrl);
-                              } else {
-                                toast.error(
-                                  "Upload failed: No response received"
-                                );
-                              }
-                            }}
-                            onUploadError={(error: Error) => {
-                              setImageUploading(false);
-                              toast.error(`ERROR! ${error.message}`);
-                            }}
-                          />
-                        </div>
+                        <>
+                          <Upload size={18} className="mr-2" />
+                          <span>
+                            {initialData
+                              ? "Update Resource"
+                              : "Submit Resource"}
+                          </span>
+                        </>
                       )}
-                    </div>
-                    <FormDescription>
-                      Upload a thumbnail image for your resource
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <CardFooter className="flex justify-end px-0">
-                <Button
-                  className="text-secondary dark:text-secondary-foreground"
-                  type="submit"
-                  disabled={
-                    mutation.isPending || mutateR.isPending || imageUploading
-                  }
-                >
-                  {mutation.isPending || mutateR.isPending || imageUploading ? (
-                    <>
-                      <span className="mr-2">
-                        {imageUploading ? "Uploading..." : "Submitting..."}
-                      </span>
-                      <div className="border-opacity-50 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    </>
-                  ) : (
-                    <>
-                      <Upload size={18} className="mr-2" />
-                      <span>
-                        {initialData ? "Update Resource" : "Submit Resource"}
-                      </span>
-                    </>
-                  )}
-                </Button>
-              </CardFooter>
+                    </Button>
+                  </CardFooter>
+                </>
+              )}
             </form>
           </Form>
         </CardContent>

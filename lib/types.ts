@@ -21,6 +21,12 @@ export type ResourceType = {
   categories: CategoryType;
   description: string | null;
   upvoteCount: number;
-  userId: string;
   language: "hindi" | "english";
+  isVoted: boolean;
+  categoryId: string;
+  creator?: {
+    name: string;
+    username: string;
+  };
+  status: "pending" | "approved" | "rejected";
 };

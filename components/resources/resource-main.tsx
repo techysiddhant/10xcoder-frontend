@@ -10,6 +10,7 @@ import queryString from "query-string";
 import { useDebounce } from "@/hooks/use-debounce";
 import { getCategories, getResources, getTags } from "@/lib/http";
 import { CategoryType, TagType } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 import { Button } from "../ui/button";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
@@ -48,7 +49,7 @@ export const ResourceMain = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryTags = searchParams.get("tag")?.split(",") || [];
-
+  const resourceType = searchParams.get("resourceType");
   // Store filters in state
   const [tab, setTab] = useState<Filters>({
     ...queryString.parse(searchParams.toString()),
@@ -76,7 +77,7 @@ export const ResourceMain = () => {
     queryFn: async () => {
       const params = new URLSearchParams();
       if (debouncedTab.resourceType) {
-        params.append("type", debouncedTab.resourceType);
+        params.append("resourceType", debouncedTab.resourceType);
       }
       if (debouncedTab.category) {
         params.append("category", debouncedTab.category);
@@ -147,7 +148,10 @@ export const ResourceMain = () => {
             onClick={() => updateFilters({ category: category.name })}
             variant="outline"
             size="sm"
-            className={`rounded-full text-sm ${tab.category === category.name ? "bg-primary text-white hover:bg-blue-600 hover:text-white" : ""}`}
+            className={cn(
+              "rounded-full text-sm hover:bg-yellow-500 hover:text-white",
+              tab.category === category.name && "bg-primary text-white"
+            )}
           >
             {category.name}
           </Button>
@@ -169,7 +173,10 @@ export const ResourceMain = () => {
         <div className="space-y-6">
           <div className="space-y-4">
             <div className="flex justify-center">
-              <Tabs defaultValue="all" className="w-full max-w-md">
+              <Tabs
+                defaultValue={resourceType ? resourceType : "all"}
+                className="w-full max-w-md"
+              >
                 <TabsList className="grid w-full grid-cols-3">
                   {["all", "video", "article"].map((type) => (
                     <TabsTrigger
@@ -190,26 +197,30 @@ export const ResourceMain = () => {
 
             {/* Tags Selection */}
             <div className="flex flex-col items-center justify-center gap-3">
-              <div>
-                <ResourcesTags
-                  initialTags={tags?.map((tag: TagType) => tag.name) ?? []}
-                  selectedTags={tab.tags ? tab.tags.split(",") : []}
-                  handleTagsClick={(checked, tag) => {
-                    setTab((prev) => {
-                      const currentTags = prev.tags ? prev.tags.split(",") : [];
-                      const updatedTags = checked
-                        ? [...currentTags, tag]
-                        : currentTags.filter((t) => t !== tag);
-                      return {
-                        ...prev,
-                        tags: updatedTags.length
-                          ? updatedTags.join(",")
-                          : undefined,
-                      };
-                    });
-                  }}
-                />
-              </div>
+              {tags?.length > 0 && (
+                <div>
+                  <ResourcesTags
+                    initialTags={tags?.map((tag: TagType) => tag.name) ?? []}
+                    selectedTags={tab.tags ? tab.tags.split(",") : []}
+                    handleTagsClick={(checked, tag) => {
+                      setTab((prev) => {
+                        const currentTags = prev.tags
+                          ? prev.tags.split(",")
+                          : [];
+                        const updatedTags = checked
+                          ? [...currentTags, tag]
+                          : currentTags.filter((t) => t !== tag);
+                        return {
+                          ...prev,
+                          tags: updatedTags.length
+                            ? updatedTags.join(",")
+                            : undefined,
+                        };
+                      });
+                    }}
+                  />
+                </div>
+              )}
 
               {/* Clear All Button (Shown Only if Tags are Selected) */}
               {tab.tags && (
