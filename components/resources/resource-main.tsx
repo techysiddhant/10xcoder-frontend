@@ -10,6 +10,7 @@ import queryString from "query-string";
 import { useDebounce } from "@/hooks/use-debounce";
 import { getCategories, getResources, getTags } from "@/lib/http";
 import { CategoryType, TagType } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 import { Button } from "../ui/button";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
@@ -147,7 +148,10 @@ export const ResourceMain = () => {
             onClick={() => updateFilters({ category: category.name })}
             variant="outline"
             size="sm"
-            className={`rounded-full text-sm ${tab.category === category.name ? "bg-primary text-white hover:bg-yellow-500 hover:text-white" : "hover:bg-yellow-500 hover:text-white"}`}
+            className={cn(
+              "rounded-full text-sm hover:bg-yellow-500 hover:text-white",
+              tab.category === category.name && "bg-primary text-white"
+            )}
           >
             {category.name}
           </Button>

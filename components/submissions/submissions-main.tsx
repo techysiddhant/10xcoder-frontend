@@ -184,13 +184,15 @@ export const SubmissionsMain = () => {
                 </Table>
               </div>
             )}
-            <div className="mt-4 flex items-center justify-end gap-2">
-              <SubmissionPagination
-                page={resourcesData?.page}
-                limit={resourcesData?.limit}
-                totalCount={resourcesData?.totalCount}
-              />
-            </div>
+            {resourcesData?.totalCount > 0 && (
+              <div className="mt-4 flex items-center justify-end gap-2">
+                <SubmissionPagination
+                  page={resourcesData?.page}
+                  limit={resourcesData?.limit}
+                  totalCount={resourcesData?.totalCount}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>

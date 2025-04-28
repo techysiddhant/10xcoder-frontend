@@ -19,7 +19,6 @@ import { ResourceType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const ResourceCard = ({ resource }: { resource: ResourceType }) => {
-  console.log(resource);
   const handleUpvote = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();

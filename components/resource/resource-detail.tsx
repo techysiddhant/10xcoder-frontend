@@ -11,6 +11,7 @@ import {
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ResourceType } from "@/lib/types";
+import { getYoutubeEmbedUrl } from "@/lib/utils";
 
 import { ResourcePlaceholder } from "../resource-placeholder";
 import { AspectRatio } from "../ui/aspect-ratio";
@@ -121,7 +122,8 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
                 <AspectRatio ratio={16 / 9}>
                   <iframe
                     className="h-full w-full rounded-md"
-                    src="https://www.youtube.com/embed/hZeprLzd6xM"
+                    // src="https://www.youtube.com/embed/hZeprLzd6xM"
+                    src={getYoutubeEmbedUrl(resource.url)!}
                     title={resource.title}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerPolicy="strict-origin-when-cross-origin"
@@ -239,7 +241,7 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
                 </span>
                 <span className="font-medium">
                   {resource?.creator?.username
-                    ? `@${  resource.creator.username}`
+                    ? `@${resource.creator.username}`
                     : resource?.creator?.name}
                 </span>
               </div>

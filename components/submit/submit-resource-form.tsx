@@ -81,7 +81,7 @@ export const SubmitResourceForm = ({
       url: initialData?.url || "",
       resourceType: "video",
       categoryId: initialData?.categoryId || "",
-      tags: initialData?.tags.join(",") || "",
+      tags: initialData?.tags.join(",") ?? "",
       language: "english",
     },
   });
@@ -95,10 +95,14 @@ export const SubmitResourceForm = ({
   const url = form.watch("url");
   useEffect(() => {
     if (!url) return;
+    const controller = new AbortController();
     const fetchImage = async () => {
       try {
         setImageLoading(true);
-        const response = await fetch(`https://api.microlink.io?url=${url}`);
+        const response = await fetch(
+          `https://api.microlink.io?url=${encodeURIComponent(url)}`,
+          { signal: controller.signal }
+        );
         const data = await response.json();
         if (data?.data?.image?.url) {
           setThumbnailPreview(data.data.image.url);
@@ -114,6 +118,7 @@ export const SubmitResourceForm = ({
       console.log("Fetching image based on URL...");
       fetchImage();
     }
+    return () => controller.abort();
   }, [url]);
   const clearThumbnail = () => {
     form.setValue("image", undefined);
@@ -422,7 +427,8 @@ export const SubmitResourceForm = ({
                       disabled={
                         mutation.isPending ||
                         mutateR.isPending ||
-                        imageUploading
+                        imageUploading ||
+                        imageLoading
                       }
                     >
                       {mutation.isPending ||
