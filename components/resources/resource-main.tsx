@@ -3,18 +3,21 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import queryString from "query-string";
+import Masonry from "react-masonry-css";
+import { ScaleLoader } from "react-spinners";
 
 import { useDebounce } from "@/hooks/use-debounce";
 import { getCategories, getResources, getTags } from "@/lib/http";
 import { CategoryType, TagType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+import InfiniteScrollContainer from "../infinite-scroll-container";
 import { Button } from "../ui/button";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
-import { ResourcesList } from "./resources-list";
+import { ResourceCard } from "./resource-card";
 import { ResourcesTags } from "./resources-tags";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -55,7 +58,12 @@ export const ResourceMain = () => {
     ...queryString.parse(searchParams.toString()),
     tags: queryTags.length ? queryTags.join(",") : undefined,
   });
-
+  const breakpointColumnsObj = {
+    default: 4,
+    1100: 3,
+    700: 2,
+    500: 1,
+  };
   // 🔹 Apply debounce to `tab` to prevent rapid API calls
   const debouncedTab = useDebounce(tab, 500);
 
@@ -72,28 +80,33 @@ export const ResourceMain = () => {
       return getCategories().then((res) => res.data);
     },
   });
-  const { data: resources } = useQuery({
-    queryKey: ["resources", debouncedTab], // 🔹 Use debouncedTab here
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (debouncedTab.resourceType) {
-        params.append("resourceType", debouncedTab.resourceType);
-      }
-      if (debouncedTab.category) {
-        params.append("category", debouncedTab.category);
-      }
-      if (debouncedTab.tags) {
-        params.append("tags", debouncedTab.tags);
-      }
-      if (debouncedTab.q) {
-        params.append("q", debouncedTab.q);
-      }
-      return getResources(params.toString()).then((res) => res.data);
-    },
-    enabled: !!debouncedTab,
-  });
-
-  // Update state when filters change
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } =
+    useInfiniteQuery({
+      queryKey: ["resources", debouncedTab],
+      queryFn: async ({ pageParam }) => {
+        const params = new URLSearchParams();
+        if (debouncedTab.resourceType) {
+          params.append("resourceType", debouncedTab.resourceType);
+        }
+        if (debouncedTab.category) {
+          params.append("category", debouncedTab.category);
+        }
+        if (debouncedTab.tags) {
+          params.append("tags", debouncedTab.tags);
+        }
+        if (debouncedTab.q) {
+          params.append("q", debouncedTab.q);
+        }
+        if (pageParam) {
+          params.append("cursor", pageParam);
+        }
+        return getResources(params.toString()).then((res) => res.data);
+      },
+      initialPageParam: undefined,
+      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      enabled: !!debouncedTab,
+    });
+  const allResources = data?.pages.flatMap((page) => page.resources) ?? [];
   const updateFilters = (updates: Partial<Filters>) => {
     setTab((prev) => ({ ...prev, ...updates }));
   };
@@ -238,7 +251,52 @@ export const ResourceMain = () => {
         </div>
 
         {/* Resource List */}
-        {resources && <ResourcesList resources={resources} />}
+        {allResources && allResources.length > 0 ? (
+          <div className="mt-10">
+            <InfiniteScrollContainer
+              onBottomReached={() =>
+                hasNextPage && !isFetching && fetchNextPage()
+              }
+            >
+              <Masonry
+                breakpointCols={breakpointColumnsObj}
+                className="flex w-auto gap-6"
+                columnClassName="masonry-column"
+              >
+                {allResources.map((resource, index) => (
+                  <motion.div
+                    key={resource.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: index * 0.05, // <-- This staggers cards by 50ms each
+                    }}
+                  >
+                    <ResourceCard resource={resource} />
+                  </motion.div>
+                ))}
+              </Masonry>
+              {isFetchingNextPage && (
+                <div className="my-4 flex justify-center">
+                  <ScaleLoader color="#f59e0b" />
+                </div>
+              )}
+            </InfiniteScrollContainer>
+          </div>
+        ) : isFetching ? (
+          <div className="my-4 flex justify-center">
+            <ScaleLoader color="#f59e0b" />
+          </div>
+        ) : (
+          <motion.div
+            className="py-12 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <h3 className="mb-2 text-xl font-medium">No resources found</h3>
+          </motion.div>
+        )}
       </motion.div>
     </motion.div>
   );

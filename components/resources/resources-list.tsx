@@ -38,7 +38,6 @@ export const ResourcesList = ({ resources }: ResourcesListProps) => {
             >
               <ResourceCard resource={resource} />
             </motion.div>
-            // <ResourceCard key={resource.id} resource={resource} />
           ))}
         </Masonry>
       ) : (
