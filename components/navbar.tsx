@@ -18,7 +18,7 @@ import { Button } from "./ui/button";
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "Resources", path: "/resources" },
-  { name: "Submit", path: "/submit" },
+  { name: "Create", path: "/submit" },
   { name: "About", path: "/about" },
 ];
 export const Navbar = () => {
