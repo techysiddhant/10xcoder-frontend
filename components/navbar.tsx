@@ -101,8 +101,8 @@ export const Navbar = () => {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <Logo />
-              <span className="font-display text-xl font-bold text-slate-900 dark:text-white">
-                no-name
+              <span className="font-display text-2xl font-bold text-slate-900 dark:text-white">
+                10xCoder
               </span>
             </Link>
           </div>

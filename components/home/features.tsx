@@ -16,7 +16,7 @@ export const Features = () => {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-3xl font-bold">Why Noname?</h2>
+          <h2 className="text-3xl font-bold">Why 10xCoder.club</h2>
           <p className="text-muted-foreground mt-4">
             Everything you need to accelerate your learning and stay up-to-date
             with the latest technologies.
