@@ -23,7 +23,7 @@ export const AboutMain = () => {
       >
         <div className="mb-12 text-center">
           <h1 className="font-display mb-4 text-4xl font-bold md:text-5xl">
-            About no-name
+            About 10xCoder.club
           </h1>
           <p className="text-muted-foreground mx-auto max-w-3xl text-lg">
             Curating the best free resources for developers to learn, grow, and
@@ -31,34 +31,34 @@ export const AboutMain = () => {
           </p>
         </div>
 
-        <div className="glass-card mb-12 p-8">
+        <div className="bg-card mb-12 rounded-xl border p-8 shadow-sm backdrop-blur-sm">
           <h2 className="mb-6 text-2xl font-bold">Our Mission</h2>
           <p className="mb-6 text-lg">
-            no-name was created with a simple mission: to help developers at all
-            levels find the highest quality free resources across the web. We
-            believe that knowledge should be accessible to everyone, regardless
-            of their financial situation.
+            10xCoder.club was created with a simple mission: to help developers
+            at all levels find the highest quality free resources across the
+            web. We believe that knowledge should be accessible to everyone,
+            regardless of their financial situation.
           </p>
           <p className="mb-6 text-lg">
             The internet is filled with incredible learning materials, but
             finding the gems among the noise can be challenging. That&lsquo;s
-            why we built no-name as a community-driven platform where developers
-            can discover, share, and upvote the best resources they&lsquo;ve
-            found helpful in their journey.
+            why we built 10xCoder.club as a community-driven platform where
+            developers can discover, share, and upvote the best resources
+            they&lsquo;ve found helpful in their journey.
           </p>
           <p className="text-lg">
             Whether you&lsquo;re just starting out or you&lsquo;re a seasoned
-            professional looking to learn something new, no-name aims to be your
-            go-to hub for finding the best free learning materials in the
-            programming world.
+            professional looking to learn something new, 10xCoder.club aims to
+            be your go-to hub for finding the best free learning materials in
+            the programming world.
           </p>
         </div>
 
         <div className="mb-12 grid gap-8 md:grid-cols-2">
-          <div className="glass-card p-6">
+          <div className="bg-card rounded-xl border p-6 shadow-sm backdrop-blur-sm">
             <div className="mb-4 flex items-center">
-              <div className="mr-4 rounded-lg bg-blue-500/10 p-3">
-                <Users className="h-6 w-6 text-blue-500" />
+              <div className="mr-4 rounded-lg bg-amber-500/10 p-3">
+                <Users className="text-primary h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold">Community-Driven</h3>
             </div>
@@ -68,10 +68,10 @@ export const AboutMain = () => {
             </p>
           </div>
 
-          <div className="glass-card p-6">
+          <div className="bg-card rounded-xl border p-6 shadow-sm backdrop-blur-sm">
             <div className="mb-4 flex items-center">
-              <div className="mr-4 rounded-lg bg-blue-500/10 p-3">
-                <BookOpen className="h-6 w-6 text-blue-500" />
+              <div className="mr-4 rounded-lg bg-amber-500/10 p-3">
+                <BookOpen className="text-primary h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold">Quality Focus</h3>
             </div>
@@ -81,23 +81,23 @@ export const AboutMain = () => {
             </p>
           </div>
 
-          <div className="glass-card p-6">
+          <div className="bg-card rounded-xl border p-6 shadow-sm backdrop-blur-sm">
             <div className="mb-4 flex items-center">
-              <div className="mr-4 rounded-lg bg-blue-500/10 p-3">
-                <Heart className="h-6 w-6 text-blue-500" />
+              <div className="mr-4 rounded-lg bg-amber-500/10 p-3">
+                <Heart className="text-primary h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold">100% Free</h3>
             </div>
             <p className="text-muted-foreground">
-              no-name is committed to featuring only completely free resources.
-              No paywalls, no surprises.
+              10xCoder.club is committed to featuring only completely free
+              resources. No paywalls, no surprises.
             </p>
           </div>
 
-          <div className="glass-card p-6">
+          <div className="bg-card rounded-xl border p-6 shadow-sm backdrop-blur-sm">
             <div className="mb-4 flex items-center">
-              <div className="mr-4 rounded-lg bg-blue-500/10 p-3">
-                <Sparkles className="h-6 w-6 text-blue-500" />
+              <div className="mr-4 rounded-lg bg-amber-500/10 p-3">
+                <Sparkles className="text-primary h-6 w-6" />
               </div>
               <h3 className="text-xl font-bold">Always Evolving</h3>
             </div>
@@ -108,17 +108,17 @@ export const AboutMain = () => {
           </div>
         </div>
 
-        <div className="glass-card mb-12 p-8 text-center">
+        <div className="bg-card mb-12 rounded-xl border p-8 text-center shadow-sm backdrop-blur-sm">
           <h2 className="mb-6 text-2xl font-bold">Join Our Community</h2>
           <p className="mb-8 text-lg">
-            no-name is an open-source project, and we welcome contributions from
-            developers of all skill levels. Whether you want to submit
-            resources, improve the platform, or just say hello, we&lsquo;d love
-            to hear from you!
+            10xCoder.club is an open-source project, and we welcome
+            contributions from developers of all skill levels. Whether you want
+            to submit resources, improve the platform, or just say hello,
+            we&lsquo;d love to hear from you!
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Button
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+              className="text-secondary dark:text-secondary-foreground flex items-center gap-2"
               size="lg"
             >
               <Github className="h-5 w-5" />
@@ -137,7 +137,7 @@ export const AboutMain = () => {
 
         <div className="text-center">
           <p className="text-muted-foreground">
-            Built with 💙 by developers, for developers — no-name ©{" "}
+            Built with ❤️ by developers, for developers — 10xCoder.club ©{" "}
             {new Date().getFullYear()}
           </p>
         </div>

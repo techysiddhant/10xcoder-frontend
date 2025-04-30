@@ -18,7 +18,7 @@ export const Hero = () => {
           variants={staggerContainer}
         >
           <motion.span
-            className="text-primary dark:bg-primary dark:text-primary-foreground rounded-full bg-yellow-200/50 px-3 py-1 text-sm font-medium"
+            className="text-primary dark:bg-primary dark:text-primary-foreground rounded-full bg-amber-500/10 px-3 py-1 text-sm font-medium"
             variants={fadeInUp}
           >
             Developer Resources
