@@ -10,6 +10,7 @@ import Masonry from "react-masonry-css";
 import { ScaleLoader } from "react-spinners";
 
 import { useDebounce } from "@/hooks/use-debounce";
+import { useUpvote } from "@/hooks/use-upvote";
 import { getCategories, getResources, getTags } from "@/lib/http";
 import { CategoryType, TagType } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -40,7 +41,7 @@ const itemVariants = {
   },
 };
 
-type Filters = {
+export type Filters = {
   q?: string;
   tags?: string;
   resourceType?: string;
@@ -53,6 +54,7 @@ export const ResourceMain = () => {
   const searchParams = useSearchParams();
   const queryTags = searchParams.get("tag")?.split(",") || [];
   const resourceType = searchParams.get("resourceType");
+  const upvotes = useUpvote();
   // Store filters in state
   const [tab, setTab] = useState<Filters>({
     ...queryString.parse(searchParams.toString()),
@@ -110,7 +112,6 @@ export const ResourceMain = () => {
   const updateFilters = (updates: Partial<Filters>) => {
     setTab((prev) => ({ ...prev, ...updates }));
   };
-
   // Push updated filters to the URL when `tab` changes
   useEffect(() => {
     const filteredParams = Object.fromEntries(
@@ -273,7 +274,10 @@ export const ResourceMain = () => {
                       delay: index * 0.05, // <-- This staggers cards by 50ms each
                     }}
                   >
-                    <ResourceCard resource={resource} />
+                    <ResourceCard
+                      resource={resource}
+                      debouncedTab={debouncedTab}
+                    />
                   </motion.div>
                 ))}
               </Masonry>
