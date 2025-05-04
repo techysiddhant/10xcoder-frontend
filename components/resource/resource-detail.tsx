@@ -1,5 +1,6 @@
 "use client";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
   ArrowUpRight,
@@ -10,11 +11,12 @@ import {
 } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { upvoteResource } from "@/lib/http";
 import { ResourceType } from "@/lib/types";
-import { getYoutubeEmbedUrl } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
+import { LazyIFrame } from "../lazy-iframe";
 import { ResourcePlaceholder } from "../resource-placeholder";
-import { AspectRatio } from "../ui/aspect-ratio";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
@@ -40,6 +42,24 @@ const itemVariants = {
   },
 };
 export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
+  const queryClient = useQueryClient();
+  const upvoteMutation = useMutation({
+    mutationFn: async (resourceId: string) => {
+      return (await upvoteResource(resourceId)).data;
+    },
+    onSuccess: ({ resourceId, action, count }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      queryClient.setQueryData(["resource", resourceId], (oldResource: any) => {
+        if (!oldResource) return oldResource;
+
+        return {
+          ...oldResource,
+          upvoteCount: count,
+          hasUpvoted: action === "added",
+        };
+      });
+    },
+  });
   const getTypeIcon = () => {
     switch (resource.resourceType) {
       case "video":
@@ -59,7 +79,12 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
       day: "numeric",
     });
   };
-
+  const handleUpvote = () => {
+    upvoteMutation.mutate(resource.id);
+  };
+  const handleVisit = () => {
+    window.open(resource.url, "_blank");
+  };
   return (
     <motion.div
       variants={containerVariants}
@@ -118,21 +143,9 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
                 )}
               </div>
             ) : (
-              <div className="aspect-video w-full">
-                <AspectRatio ratio={16 / 9}>
-                  <iframe
-                    className="h-full w-full rounded-md"
-                    // src="https://www.youtube.com/embed/hZeprLzd6xM"
-                    src={getYoutubeEmbedUrl(resource.url)!}
-                    title={resource.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    allowFullScreen
-                  ></iframe>
-                </AspectRatio>
-              </div>
+              <LazyIFrame url={resource.url} title={resource.title} />
             )}
-            {}
+
             <div className="p-6">
               <h2 className="mb-4 text-xl font-semibold">Description</h2>
               <p className="leading-relaxed text-slate-600 dark:text-slate-300">
@@ -150,7 +163,7 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
               </div>
 
               <Button
-                // onClick={handleVisit}
+                onClick={handleVisit}
                 className="group bg-primary flex w-full items-center justify-center text-white hover:bg-amber-600"
               >
                 <span>Visit Resource</span>
@@ -163,30 +176,49 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
           </Card>
         </motion.div>
         <motion.div className="space-y-6" variants={itemVariants}>
-          <Card className="glass-card p-6">
-            <h2 className="mb-4 text-lg font-semibold">Resource Actions</h2>
+          <Card className="bg-card border p-6 shadow-sm backdrop-blur-sm transition-all hover:shadow-xl">
+            <h2 className="text-lg font-semibold">Resource Actions</h2>
 
-            <div className="space-y-4">
-              {/* <div className="flex items-center space-x-3">
-                                <Button
-                                    variant={upvoted ? "default" : "outline"}
-                                    className={`flex-1 flex items-center justify-center ${upvoted ? "bg-blue-600 hover:bg-blue-700 text-white" : ""
-                                        }`}
-                                    onClick={handleUpvote}
-                                >
-                                    <ArrowUp size={18} className="mr-2" />
-                                    <span>Upvote ({upvotes})</span>
-                                </Button>
-                                <Button
-                                    variant={downvoted ? "default" : "outline"}
-                                    className={`flex-1 flex items-center justify-center ${downvoted ? "bg-red-600 hover:bg-red-700 text-white" : ""
-                                        }`}
-                                    onClick={handleDownvote}
-                                >
-                                    <ThumbsDown size={18} className="mr-2" />
-                                    <span>Downvote</span>
-                                </Button>
-                            </div> */}
+            <div className="">
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={handleUpvote}
+                  className={cn(
+                    "shadow-primary/20 border-primary/20 text-primary inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-2 py-1 font-semibold shadow-sm",
+                    resource?.hasUpvoted && "bg-amber-500/10"
+                  )}
+                >
+                  {resource?.hasUpvoted ? (
+                    <svg
+                      viewBox="0 0 24 24"
+                      width={24}
+                      height={24}
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M4 14h4v7a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-7h4a1.001 1.001 0 0 0 .781-1.625l-8-10c-.381-.475-1.181-.475-1.562 0l-8 10A1.001 1.001 0 0 0 4 14z"
+                        fill="#f59e0b"
+                        className="fill-#f59e0b"
+                      ></path>
+                    </svg>
+                  ) : (
+                    <svg
+                      viewBox="0 0 24 24"
+                      width={24}
+                      height={24}
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.781 2.375c-.381-.475-1.181-.475-1.562 0l-8 10A1.001 1.001 0 0 0 4 14h4v7a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-7h4a1.001 1.001 0 0 0 .781-1.625l-8-10zM15 12h-1v8h-4v-8H6.081L12 4.601 17.919 12H15z"
+                        fill="#f59e0b"
+                        className="fill-#f59e0b"
+                      ></path>
+                    </svg>
+                  )}
+                  <span className="text-lg">{resource?.upvoteCount}</span>
+                  <span>{resource?.hasUpvoted ? "Upvoted" : "Upvote"}</span>
+                </button>
+              </div>
 
               {/* <Button
                                 variant={bookmarked ? "default" : "outline"}
@@ -200,7 +232,7 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
             </div>
           </Card>
 
-          <Card className="glass-card p-6">
+          <Card className="bg-card border p-6 shadow-sm backdrop-blur-sm transition-all hover:shadow-xl">
             <h2 className="mb-4 text-lg font-semibold">
               About this {resource.resourceType}
             </h2>
@@ -228,12 +260,6 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
                 <span className="font-medium">
                   {getFormattedDate(resource.createdAt)}
                 </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600 dark:text-slate-300">
-                  Upvotes:
-                </span>
-                <span className="font-medium">{resource.upvoteCount}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-600 dark:text-slate-300">

@@ -22,7 +22,7 @@ export type ResourceType = {
   description: string | null;
   upvoteCount: number;
   language: "hindi" | "english";
-  isVoted: boolean;
+  hasUpvoted: boolean;
   categoryId: string;
   creator?: {
     name: string;

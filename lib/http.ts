@@ -31,3 +31,6 @@ export const updateResource = (formData: unknown, resourceId: string) =>
   api.patch(`/resource/${resourceId}`, formData, {
     withCredentials: true,
   });
+
+export const upvoteResource = (resourceId: string) =>
+  api.patch(`/resource/upvote/${resourceId}`, {}, { withCredentials: true });

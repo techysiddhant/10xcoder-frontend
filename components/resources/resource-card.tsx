@@ -1,28 +1,69 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from "next/link";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import {
-  ArrowUp,
-  ArrowUpRight,
-  Bookmark,
-  FileText,
-  Tag,
-  Video,
-} from "lucide-react";
+import { ArrowUpRight, Bookmark, FileText, Tag, Video } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { upvoteResource } from "@/lib/http";
 import { ResourceType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export const ResourceCard = ({ resource }: { resource: ResourceType }) => {
+import { Filters } from "./resource-main";
+
+export const ResourceCard = ({
+  resource,
+  debouncedTab,
+}: {
+  resource: ResourceType;
+  debouncedTab: Filters;
+}) => {
+  const queryClient = useQueryClient();
+  const upvoteMutation = useMutation({
+    mutationFn: async (resourceId: string) => {
+      return (await upvoteResource(resourceId)).data;
+    },
+    onSuccess: ({ resourceId, action, count }) => {
+      queryClient.setQueryData(["resource", resourceId], (oldResource: any) => {
+        if (!oldResource) return oldResource;
+
+        return {
+          ...oldResource,
+          upvoteCount: count,
+          hasUpvoted: action === "added",
+        };
+      });
+      queryClient.setQueryData(["resources", debouncedTab], (oldData: any) => {
+        if (!oldData) return oldData;
+
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any) => ({
+            ...page,
+            resources: page.resources.map((resource: any) => {
+              if (resource.id === resourceId) {
+                return {
+                  ...resource,
+                  upvoteCount: count,
+                  hasUpvoted: action === "added",
+                };
+              }
+              return resource;
+            }),
+          })),
+        };
+      });
+    },
+  });
   const handleUpvote = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("upvoted");
+    upvoteMutation.mutate(resource.id);
   };
   const getTypeIcon = () => {
     switch (resource.resourceType) {
@@ -63,7 +104,6 @@ export const ResourceCard = ({ resource }: { resource: ResourceType }) => {
               </div>
             </div>
           )}
-
           {/* Main Content */}
           <div
             className={cn(
@@ -76,20 +116,43 @@ export const ResourceCard = ({ resource }: { resource: ResourceType }) => {
                 {resource?.categoryName}
               </Badge>
               <div className="flex items-center space-x-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={`h-7 w-7 ${resource?.upvoteCount ? "text-primary dark:text-primary" : "text-slate-500 dark:text-slate-400"}`}
+                <button
                   onClick={handleUpvote}
+                  className="cursor-pointer rounded-lg p-1 hover:bg-amber-500/10 dark:hover:bg-amber-500/10"
                 >
-                  <ArrowUp size={14} />
-                </Button>
+                  {resource?.hasUpvoted ? (
+                    <svg
+                      viewBox="0 0 24 24"
+                      width={20}
+                      height={20}
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M4 14h4v7a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-7h4a1.001 1.001 0 0 0 .781-1.625l-8-10c-.381-.475-1.181-.475-1.562 0l-8 10A1.001 1.001 0 0 0 4 14z"
+                        fill="#f59e0b"
+                        className="fill-#f59e0b"
+                      ></path>
+                    </svg>
+                  ) : (
+                    <svg
+                      viewBox="0 0 24 24"
+                      width={20}
+                      height={20}
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.781 2.375c-.381-.475-1.181-.475-1.562 0l-8 10A1.001 1.001 0 0 0 4 14h4v7a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-7h4a1.001 1.001 0 0 0 .781-1.625l-8-10zM15 12h-1v8h-4v-8H6.081L12 4.601 17.919 12H15z"
+                        fill="#f59e0b"
+                        className="fill-#f59e0b"
+                      ></path>
+                    </svg>
+                  )}
+                </button>
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-slate-500 dark:text-slate-400"
+                  className="h-7 w-7 hover:bg-amber-500/10 dark:hover:bg-amber-500/10"
                 >
-                  <Bookmark size={14} />
+                  <Bookmark size={20} className="size-5 text-amber-500" />
                 </Button>
               </div>
             </div>
@@ -119,11 +182,41 @@ export const ResourceCard = ({ resource }: { resource: ResourceType }) => {
             </div>
 
             {/* View Button */}
-            <div className="mt-auto flex items-center justify-end">
+            <div className="mt-auto flex items-center justify-between">
+              <div className="text-primary inline-flex items-center justify-start gap-1 rounded-full bg-amber-500/10 px-3 py-0.5 text-sm font-semibold">
+                {resource?.hasUpvoted ? (
+                  <svg
+                    viewBox="0 0 24 24"
+                    width={12}
+                    height={12}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M4 14h4v7a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-7h4a1.001 1.001 0 0 0 .781-1.625l-8-10c-.381-.475-1.181-.475-1.562 0l-8 10A1.001 1.001 0 0 0 4 14z"
+                      fill="#f59e0b"
+                      className="fill-#f59e0b"
+                    ></path>
+                  </svg>
+                ) : (
+                  <svg
+                    viewBox="0 0 24 24"
+                    width={12}
+                    height={12}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12.781 2.375c-.381-.475-1.181-.475-1.562 0l-8 10A1.001 1.001 0 0 0 4 14h4v7a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-7h4a1.001 1.001 0 0 0 .781-1.625l-8-10zM15 12h-1v8h-4v-8H6.081L12 4.601 17.919 12H15z"
+                      fill="#f59e0b"
+                      className="fill-#f59e0b"
+                    ></path>
+                  </svg>
+                )}
+                {resource.upvoteCount}
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-primary dark:text-primary flex h-auto items-center p-0 text-xs"
+                className="text-primary dark:text-primary flex h-auto items-center text-xs"
               >
                 <span>View</span>
                 <ArrowUpRight size={12} className="ml-1" />
