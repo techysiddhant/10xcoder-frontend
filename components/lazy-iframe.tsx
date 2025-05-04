@@ -4,8 +4,6 @@ import { useInView } from "react-intersection-observer";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
-// Adjust import path as needed
-
 interface LazyIFrameProps {
   url: string;
   title: string;
