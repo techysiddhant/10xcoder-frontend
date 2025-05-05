@@ -93,7 +93,10 @@ export const ResetPasswordForm = () => {
             </p>
           </div>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="my-4 space-y-4"
+            >
               <FormField
                 control={form.control}
                 name="password"
@@ -188,7 +191,7 @@ export const ResetPasswordForm = () => {
           <div className="text-center text-sm">
             <Link
               href="/signin"
-              className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+              className="text-primary font-medium hover:text-amber-600 dark:hover:text-amber-300"
             >
               Back to Sign In
             </Link>

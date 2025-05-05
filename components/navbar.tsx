@@ -11,6 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useSession } from "@/hooks/use-session";
 
 import Logo from "./logo";
+import { LogoText } from "./logo-text";
 import { ProfileMenu } from "./profile-menu";
 import { ThemeToggler } from "./theme-toggler";
 import { Button } from "./ui/button";
@@ -101,9 +102,7 @@ export const Navbar = () => {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <Logo />
-              <span className="font-display text-2xl font-bold text-slate-900 dark:text-white">
-                10xCoder
-              </span>
+              <LogoText />
             </Link>
           </div>
           {!isMobile ? (

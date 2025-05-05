@@ -44,9 +44,10 @@ export const SocialSigninForm = () => {
             : env.NEXT_PUBLIC_URL,
         },
         {
-          onSuccess: () => {
-            toast.success("Logged in successfully");
-          },
+          // onSuccess: () => {
+          //   router.push(callback ? callback : "/");
+          //   toast.success("Logged in successfully");
+          // },
           onError: (ctx) => {
             toast.error(ctx.error.message ?? "Something went wrong.");
           },

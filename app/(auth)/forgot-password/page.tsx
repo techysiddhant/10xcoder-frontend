@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 import Logo from "@/components/logo";
+import { LogoText } from "@/components/logo-text";
 
 const ForgotPasswordPage = () => {
   return (
@@ -16,7 +17,7 @@ const ForgotPasswordPage = () => {
             <div className="flex items-center justify-center">
               <Logo />
             </div>
-            10xCoder
+            <LogoText />
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-center">

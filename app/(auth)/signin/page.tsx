@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import Logo from "@/components/logo";
+import { LogoText } from "@/components/logo-text";
 
 import { SignIn } from "./signin";
 
@@ -17,7 +18,7 @@ const SignInPage = () => {
             <div className="flex items-center justify-center">
               <Logo />
             </div>
-            10xCoder
+            <LogoText />
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-center">
