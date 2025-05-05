@@ -15,7 +15,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       ui_host: "https://us.posthog.com",
       capture_pageview: false, // We capture pageviews manually
       capture_pageleave: true, // Enable pageleave capture
-      debug: env.NODE_ENV === "development",
+      debug: env.NEXT_PUBLIC_NODE_ENV === "development",
     });
   }, []);
 
@@ -37,7 +37,7 @@ function PostHogPageView() {
       let url = window.origin + pathname;
       const search = searchParams.toString();
       if (search) {
-        url += `?${  search}`;
+        url += `?${search}`;
       }
       posthog.capture("$pageview", { $current_url: url });
     }
