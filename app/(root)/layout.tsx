@@ -1,10 +1,11 @@
 import React from "react";
 
 import { Navbar } from "@/components/navbar";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <>
+    <PostHogProvider>
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div
           aria-hidden
@@ -40,7 +41,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       </div>
       <Navbar />
       <main className="pt-32 md:pt-36">{children}</main>
-    </>
+    </PostHogProvider>
   );
 };
 

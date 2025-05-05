@@ -3,6 +3,7 @@ import { Inter, Poppins } from "next/font/google";
 
 import { Toaster } from "react-hot-toast";
 
+import { PostHogProvider } from "@/components/providers/posthog-provider";
 import ReactQueryProvider from "@/components/providers/react-query-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
@@ -53,23 +54,25 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="10xcoder.club" />
       </head>
       <body className={`${poppins.variable} ${inter.variable} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <ReactQueryProvider>
-            {children}
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 5000,
-                removeDelay: 1000,
-              }}
-            />
-          </ReactQueryProvider>
-        </ThemeProvider>
+        <PostHogProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ReactQueryProvider>
+              {children}
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 5000,
+                  removeDelay: 1000,
+                }}
+              />
+            </ReactQueryProvider>
+          </ThemeProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

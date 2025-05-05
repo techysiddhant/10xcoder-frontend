@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { motion } from "framer-motion";
 import { MenuIcon, X } from "lucide-react";
+import posthog from "posthog-js";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSession } from "@/hooks/use-session";
@@ -86,6 +87,11 @@ export const Navbar = () => {
       },
     },
   };
+  const handleClick = (name: string) => {
+    posthog.capture("navbar_link_clicked", {
+      name,
+    });
+  };
   return (
     <motion.nav
       className={`fixed top-0 right-0 left-0 z-50 ${
@@ -114,6 +120,7 @@ export const Navbar = () => {
                 {navLinks.map((link) => (
                   <motion.div key={link.path} variants={itemVariants}>
                     <Link
+                      onClick={() => handleClick(link.name)}
                       href={link.path}
                       className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                         pathname === link.path
@@ -177,7 +184,10 @@ export const Navbar = () => {
               <Link
                 key={link.path}
                 href={link.path}
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  handleClick(link.name);
+                  setMobileMenuOpen(false);
+                }}
                 className={`block rounded-md px-3 py-3 text-base font-medium ${
                   pathname === link.path
                     ? "text-primary dark:text-primary bg-amber-100/50 dark:bg-amber-900/20"
