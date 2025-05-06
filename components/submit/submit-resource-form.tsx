@@ -39,13 +39,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { env } from "@/env";
 import { fetchData } from "@/lib/fetch-utils";
 import { createResource, updateResource } from "@/lib/http";
 import { submitResourceSchema } from "@/lib/schema";
 import { CategoryType, ResourceType } from "@/lib/types";
 
+import { Tiptap } from "../tiptap";
 import { UploadDropzone } from "../upload-button";
 
 const formVariants = {
@@ -149,6 +149,7 @@ export const SubmitResourceForm = ({
       queryClient.invalidateQueries({
         queryKey: ["user-resources"],
       });
+      router.push("/submissions");
     },
   });
 
@@ -292,11 +293,7 @@ export const SubmitResourceForm = ({
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Provide a helpful description of this resource..."
-                        className="min-h-32"
-                        {...field}
-                      />
+                      <Tiptap onChange={field.onChange} content={field.value} />
                     </FormControl>
                     <FormDescription>
                       Explain what makes this resource valuable
@@ -305,6 +302,7 @@ export const SubmitResourceForm = ({
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="language"
