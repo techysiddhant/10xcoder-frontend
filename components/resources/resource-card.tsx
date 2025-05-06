@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import parse from "html-react-parser";
 import { ArrowUpRight, Bookmark, FileText, Tag, Video } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -166,9 +167,9 @@ export const ResourceCard = ({
               <h3 className="mb-2 line-clamp-2 min-h-[40px] text-base font-semibold text-slate-900 dark:text-white">
                 {resource.title}
               </h3>
-              <p className="mb-3 line-clamp-2 min-h-[36px] text-xs text-slate-600 dark:text-slate-300">
-                {resource.description}
-              </p>
+              <div className="mb-3 line-clamp-2 min-h-[36px] text-xs text-slate-600 dark:text-slate-300">
+                {parse(resource.description || "")}
+              </div>
 
               {/* Tags */}
               <div className="mb-3 flex flex-wrap gap-1.5">

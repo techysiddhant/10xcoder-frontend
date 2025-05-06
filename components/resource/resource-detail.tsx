@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import parse from "html-react-parser";
 import {
   ArrowUpRight,
   Calendar,
@@ -138,9 +139,9 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
             )}
 
             <div className="p-6">
-              <h2 className="mb-4 text-xl font-semibold">Description</h2>
-              <p className="leading-relaxed text-slate-600 dark:text-slate-300">
-                {resource.description}
+              {/* <h2 className="mb-4 text-2xl font-semibold">Description</h2> */}
+              <p className="prose prose-sm md:prose-base lg:prose-lg dark:prose-invert prose-headings:font-bold prose-headings:text-secondary-foreground prose-headings:dark:text-secondary-foreground prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-p:text-base prose-a:text-amber-500 prose-img:rounded-md prose-p:text-secondary-foreground prose-p:dark:text-secondary-foreground">
+                {parse(resource.description || "")}
               </p>
 
               <Separator className="my-6" />
