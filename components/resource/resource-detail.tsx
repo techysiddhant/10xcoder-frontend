@@ -21,6 +21,7 @@ import { addOrRemoveBookmark, upvoteResource } from "@/lib/http";
 import { ResourceType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+import { CustomImage } from "../custom-image";
 import { LazyIFrame } from "../lazy-iframe";
 import { ResourcePlaceholder } from "../resource-placeholder";
 import { Badge } from "../ui/badge";
@@ -162,12 +163,19 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
         <motion.div className="space-y-6 md:col-span-2" variants={itemVariants}>
           <Card className="bg-card overflow-hidden py-0">
             {resource.resourceType !== "video" ? (
-              <div className="aspect-video w-full">
+              <div
+                className={cn(
+                  "w-full",
+                  resource.resourceType === "article" ? "" : "aspect-video"
+                )}
+              >
                 {resource.image ? (
-                  <img
+                  <CustomImage
                     src={resource.image}
                     alt={resource.title}
                     className="h-full w-full object-cover"
+                    width={300}
+                    height={300}
                   />
                 ) : (
                   <ResourcePlaceholder type={resource.resourceType} />

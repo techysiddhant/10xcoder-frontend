@@ -18,6 +18,7 @@ import { addOrRemoveBookmark, upvoteResource } from "@/lib/http";
 import { ResourceType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+import { CustomImage } from "../custom-image";
 import { Filters } from "./resource-main";
 
 export const ResourceCard = ({
@@ -114,10 +115,12 @@ export const ResourceCard = ({
           {/* Only show image if exists */}
           {resource.image && (
             <div className="relative overflow-hidden">
-              <img
+              <CustomImage
                 src={resource.image}
                 alt={resource.title}
                 className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                width={300}
+                height={300}
               />
               <div className="absolute top-2 left-2 flex space-x-2">
                 <Badge
