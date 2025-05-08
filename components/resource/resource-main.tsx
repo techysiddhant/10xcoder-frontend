@@ -29,28 +29,12 @@ const itemVariants = {
   },
 };
 export const ResourceMain = ({ id }: ResourceMainProps) => {
-  const { data: resource, isLoading } = useQuery({
+  const { data: resource } = useQuery({
     queryKey: ["resource", id],
     queryFn: async () => {
       return getResource(id).then((res) => res.data);
     },
   });
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 pb-16">
-        <motion.div
-          variants={pageVariants}
-          initial="hidden"
-          animate="visible"
-          className="space-y-12"
-        >
-          <motion.div variants={itemVariants}>
-            <div className="h-96 animate-pulse rounded-lg bg-gray-200"></div>
-          </motion.div>
-        </motion.div>
-      </div>
-    );
-  }
   return (
     <div className="container mx-auto px-4 pb-16">
       <motion.div
