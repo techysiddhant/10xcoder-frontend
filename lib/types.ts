@@ -23,10 +23,21 @@ export type ResourceType = {
   upvoteCount: number;
   language: "hindi" | "english";
   hasUpvoted: boolean;
+  isBookmarked: boolean;
+  bookmarkCount?: number;
   categoryId: string;
   creator?: {
     name: string;
     username: string;
   };
   status: "pending" | "approved" | "rejected";
+};
+
+export type BookmarkType = {
+  id: string;
+  userId: string;
+  resourceId: string;
+  createdAt: string;
+  updatedAt: string;
+  resource: ResourceType;
 };

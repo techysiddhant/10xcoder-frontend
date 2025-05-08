@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { FileText, LogOut, User } from "lucide-react";
+import { Bookmark, FileText, LogOut, User } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -61,6 +61,10 @@ export const ProfileMenu = () => {
         <DropdownMenuItem onClick={() => router.push("/submissions")}>
           <FileText />
           <span>My Submissions</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/bookmarks")}>
+          <Bookmark />
+          <span>Bookmarks</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

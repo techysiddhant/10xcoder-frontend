@@ -34,3 +34,11 @@ export const updateResource = (formData: unknown, resourceId: string) =>
 
 export const upvoteResource = (resourceId: string) =>
   api.patch(`/resource/upvote/${resourceId}`, {}, { withCredentials: true });
+
+export const addOrRemoveBookmark = (resourceId: string) =>
+  api.post(`/resource/${resourceId}/bookmark`, {}, { withCredentials: true });
+
+export const getBookmarks = (queryString: string) =>
+  api.get(`/user/bookmarks?${queryString}`, {
+    withCredentials: true,
+  });
