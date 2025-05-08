@@ -217,10 +217,16 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
             <div className="">
               <div className="flex items-center space-x-3">
                 <button
+                  aria-label={
+                    resource.hasUpvoted ? "Remove upvote" : "Add upvote"
+                  }
+                  aria-pressed={resource.hasUpvoted}
                   onClick={handleUpvote}
+                  disabled={upvoteMutation.isPending}
                   className={cn(
                     "shadow-primary/20 border-primary/20 text-primary inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2 py-1 font-bold shadow-sm",
-                    resource?.hasUpvoted && "bg-amber-500/10"
+                    resource?.hasUpvoted && "bg-amber-500/10",
+                    upvoteMutation.isPending && "opacity-50"
                   )}
                 >
                   {resource?.hasUpvoted ? (
@@ -261,16 +267,16 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
                   <span className="text-xl">{resource?.upvoteCount}</span>
                 </button>
                 <button
+                  aria-label={
+                    resource.isBookmarked ? "Remove bookmark" : "Add bookmark"
+                  }
+                  aria-pressed={resource.isBookmarked}
                   onClick={handleBookmark}
                   disabled={bookmarkMutation.isPending}
                   className={cn(
-                    "border-primary/50 ...",
-                    bookmarkMutation.isPending &&
-                      "cursor-not-allowed opacity-50"
+                    "border-primary/50 text-primary inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2 py-1 font-bold",
+                    bookmarkMutation.isPending && "opacity-50"
                   )}
-                  // className={
-                  //   "border-primary/50 text-primary inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2 py-1 font-bold"
-                  // }
                 >
                   {resource.isBookmarked ? (
                     <svg

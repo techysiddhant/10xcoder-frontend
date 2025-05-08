@@ -144,6 +144,10 @@ export const ResourceCard = ({
               </Badge>
               <div className="flex items-center space-x-1">
                 <button
+                  aria-label={
+                    resource.hasUpvoted ? "Remove upvote" : "Add upvote"
+                  }
+                  aria-pressed={resource.hasUpvoted}
                   onClick={handleUpvote}
                   disabled={upvoteMutation.isPending}
                   className={cn(
@@ -189,6 +193,10 @@ export const ResourceCard = ({
                 </button>
                 <button
                   onClick={handleBookmark}
+                  aria-label={
+                    resource.isBookmarked ? "Remove bookmark" : "Add bookmark"
+                  }
+                  aria-pressed={resource.isBookmarked}
                   disabled={bookmarkMutation.isPending}
                   className={cn(
                     "cursor-pointer rounded-lg p-1 hover:bg-amber-500/10 dark:hover:bg-amber-500/10",
