@@ -22,15 +22,19 @@ export async function generateMetadata({
     openGraph: {
       title: resource.title,
       description: resource.description,
-      images: [resource?.image || ""],
+      images: [
+        {
+          url: resource?.image || `${env.NEXT_PUBLIC_URL}/opengraph-image.png`,
+          alt: resource.title,
+        },
+      ],
     },
     twitter: {
       title: resource.title,
       description: resource.description,
       images: [
         {
-          url:
-            resource?.image || `${env.NEXT_PUBLIC_URL}/opengraph-image.png.png`,
+          url: resource?.image || `${env.NEXT_PUBLIC_URL}/opengraph-image.png`,
           alt: resource.title,
         },
       ],
