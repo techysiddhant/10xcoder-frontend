@@ -18,7 +18,7 @@ const Bookmarks = () => {
     );
   }
   if (!session || !session.user) {
-    router.push("/signin?callbackUrl=/submissions");
+    router.push("/signin?callbackUrl=/bookmarks");
     return null;
   }
   return (
