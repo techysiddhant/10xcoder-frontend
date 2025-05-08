@@ -39,6 +39,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           /> */}
         </div>
       </div>
+
       <Navbar />
       <main className="pt-32 md:pt-36">{children}</main>
     </PostHogProvider>
