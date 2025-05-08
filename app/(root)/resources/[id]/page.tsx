@@ -6,6 +6,7 @@ import { env } from "@/env";
 import { getResource, getResources } from "@/lib/http";
 import { ResourceType } from "@/lib/types";
 
+export const revalidate = 86400;
 export async function generateMetadata({
   params,
 }: {
