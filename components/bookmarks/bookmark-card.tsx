@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { motion } from "framer-motion";
 import parse from "html-react-parser";
+import DOMPurify from "isomorphic-dompurify";
 import { ArrowUpRight, FileText, Video } from "lucide-react";
 
 import { BookmarkType } from "@/lib/types";
@@ -72,7 +73,11 @@ export const BookmarkCard = ({ bookmark }: { bookmark: BookmarkType }) => {
                 {bookmark.resource.title}
               </h3>
               <div className="mb-3 line-clamp-2 min-h-[36px] text-xs text-slate-600 dark:text-slate-300">
-                {parse(bookmark.resource.description || "")}
+                {parse(
+                  DOMPurify.sanitize(bookmark.resource.description || "", {
+                    USE_PROFILES: { html: true },
+                  })
+                )}
               </div>
             </div>
 

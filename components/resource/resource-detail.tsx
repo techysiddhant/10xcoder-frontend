@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import parse from "html-react-parser";
+import DOMPurify from "isomorphic-dompurify";
 import {
   ArrowUpRight,
   Calendar,
@@ -61,11 +62,32 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
     mutationFn: async (resourceId: string) => {
       return (await addOrRemoveBookmark(resourceId)).data;
     },
-    onSuccess: ({ resourceId }) => {
-      queryClient.invalidateQueries({
-        queryKey: ["resource", resourceId],
-      });
+    // onSuccess: ({ resourceId }) => {
+    //   queryClient.invalidateQueries({
+    //     queryKey: ["resource", resourceId],
+    //   });
+    // },
+    //TODO: return bookmark from api
+    onMutate: async (resourceId) => {
+      await queryClient.cancelQueries({ queryKey: ["resource", resourceId] });
+      const prev = queryClient.getQueryData<ResourceType>([
+        "resource",
+        resourceId,
+      ]);
+      if (prev) {
+        queryClient.setQueryData(["resource", resourceId], {
+          ...prev,
+          isBookmarked: !prev.isBookmarked,
+          bookmarkCount:
+            (prev.bookmarkCount ?? 0) + (prev.isBookmarked ? -1 : 1),
+        });
+      }
+      return { prev };
     },
+    onError: (_e, _id, ctx) =>
+      ctx?.prev && queryClient.setQueryData(["resource", _id], ctx.prev),
+    // onSettled: (_d, _e, resourceId) =>
+    //   queryClient.invalidateQueries({ queryKey: ["resource", resourceId] }),
   });
   const getTypeIcon = () => {
     switch (resource.resourceType) {
@@ -158,7 +180,11 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
 
             <div className="p-6">
               <p className="prose prose-sm md:prose-base lg:prose-lg dark:prose-invert prose-headings:font-bold prose-headings:text-secondary-foreground prose-headings:dark:text-secondary-foreground prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-p:text-base prose-a:text-amber-500 prose-img:rounded-md prose-p:text-secondary-foreground prose-p:dark:text-secondary-foreground">
-                {parse(resource.description || "")}
+                {parse(
+                  DOMPurify.sanitize(resource.description || "", {
+                    USE_PROFILES: { html: true },
+                  })
+                )}
               </p>
 
               <Separator className="my-6" />
@@ -236,9 +262,15 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
                 </button>
                 <button
                   onClick={handleBookmark}
-                  className={
-                    "border-primary/50 text-primary inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2 py-1 font-bold"
-                  }
+                  disabled={bookmarkMutation.isPending}
+                  className={cn(
+                    "border-primary/50 ...",
+                    bookmarkMutation.isPending &&
+                      "cursor-not-allowed opacity-50"
+                  )}
+                  // className={
+                  //   "border-primary/50 text-primary inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2 py-1 font-bold"
+                  // }
                 >
                   {resource.isBookmarked ? (
                     <svg

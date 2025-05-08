@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import parse from "html-react-parser";
+import DOMPurify from "isomorphic-dompurify";
 import { ArrowUpRight, FileText, Tag, Video } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -144,7 +145,11 @@ export const ResourceCard = ({
               <div className="flex items-center space-x-1">
                 <button
                   onClick={handleUpvote}
-                  className="cursor-pointer rounded-lg p-1 hover:bg-amber-500/10 dark:hover:bg-amber-500/10"
+                  disabled={upvoteMutation.isPending}
+                  className={cn(
+                    "cursor-pointer rounded-lg p-1 hover:bg-amber-500/10 dark:hover:bg-amber-500/10",
+                    upvoteMutation.isPending && "opacity-50"
+                  )}
                 >
                   {resource?.hasUpvoted ? (
                     <svg
@@ -184,7 +189,12 @@ export const ResourceCard = ({
                 </button>
                 <button
                   onClick={handleBookmark}
-                  className="cursor-pointer rounded-lg p-1 hover:bg-amber-500/10 dark:hover:bg-amber-500/10"
+                  disabled={bookmarkMutation.isPending}
+                  className={cn(
+                    "cursor-pointer rounded-lg p-1 hover:bg-amber-500/10 dark:hover:bg-amber-500/10",
+                    bookmarkMutation.isPending &&
+                      "cursor-not-allowed opacity-50"
+                  )}
                 >
                   {resource.isBookmarked ? (
                     <svg
@@ -232,7 +242,11 @@ export const ResourceCard = ({
                 {resource.title}
               </h3>
               <div className="mb-3 line-clamp-2 min-h-[36px] text-xs text-slate-600 dark:text-slate-300">
-                {parse(resource.description || "")}
+                {parse(
+                  DOMPurify.sanitize(resource.description || "", {
+                    USE_PROFILES: { html: true },
+                  })
+                )}
               </div>
 
               {/* Tags */}
