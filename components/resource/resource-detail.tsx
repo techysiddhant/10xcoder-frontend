@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo } from "react";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -111,9 +112,7 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
   const handleUpvote = () => {
     upvoteMutation.mutate(resource.id);
   };
-  const handleVisit = () => {
-    window.open(resource.url, "_blank");
-  };
+
   const handleBookmark = () => {
     bookmarkMutation.mutate(resource.id);
   };
@@ -198,14 +197,16 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
               </div>
 
               <Button
-                onClick={handleVisit}
+                asChild
                 className="group bg-primary flex w-full items-center justify-center text-white hover:bg-amber-600"
               >
-                <span>Visit Resource</span>
-                <ArrowUpRight
-                  size={18}
-                  className="ml-2 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
-                />
+                <Link href={resource.url} target="_blank">
+                  <span>Visit Resource</span>
+                  <ArrowUpRight
+                    size={18}
+                    className="ml-2 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
+                  />
+                </Link>
               </Button>
             </div>
           </Card>

@@ -21,7 +21,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "10xCoder.club",
+  title: {
+    default: "10xCoder.club",
+    template: "%s | 10xCoder.club",
+  },
   description:
     "Discover and share the best free developer resources on 10xcoder.club — curated tools, articles, and videos to boost your coding journey.",
   openGraph: {
