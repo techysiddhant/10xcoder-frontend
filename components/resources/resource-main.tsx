@@ -10,12 +10,12 @@ import Masonry from "react-masonry-css";
 import { ScaleLoader } from "react-spinners";
 
 import { useDebounce } from "@/hooks/use-debounce";
-import { useUpvote } from "@/hooks/use-upvote";
 import { getCategories, getResources, getTags } from "@/lib/http";
 import { CategoryType, TagType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 import InfiniteScrollContainer from "../infinite-scroll-container";
+import { UpvoteProvider } from "../providers/upvote-provider";
 import { Button } from "../ui/button";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { ResourceCard } from "./resource-card";
@@ -54,7 +54,6 @@ export const ResourceMain = () => {
   const searchParams = useSearchParams();
   const queryTags = searchParams.get("tag")?.split(",") || [];
   const resourceType = searchParams.get("resourceType");
-  const upvotes = useUpvote();
   // Store filters in state
   const [tab, setTab] = useState<Filters>({
     ...queryString.parse(searchParams.toString()),
@@ -131,177 +130,179 @@ export const ResourceMain = () => {
   };
 
   return (
-    <motion.div
-      variants={pageVariants}
-      initial="hidden"
-      animate="visible"
-      className="space-y-10"
-    >
+    <UpvoteProvider>
       <motion.div
-        variants={itemVariants}
-        className="mx-auto max-w-2xl space-y-4 text-center"
+        variants={pageVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-10"
       >
-        <h1 className="text-3xl font-bold text-slate-900 capitalize dark:text-white">
-          {debouncedTab.category
-            ? `${debouncedTab.category} Resources`
-            : "Resources"}
-        </h1>
-        <p className="text-slate-600 dark:text-slate-300">
-          Browse our curated collection of high-quality free coding resources
-        </p>
-      </motion.div>
+        <motion.div
+          variants={itemVariants}
+          className="mx-auto max-w-2xl space-y-4 text-center"
+        >
+          <h1 className="text-3xl font-bold text-slate-900 capitalize dark:text-white">
+            {debouncedTab.category
+              ? `${debouncedTab.category} Resources`
+              : "Resources"}
+          </h1>
+          <p className="text-slate-600 dark:text-slate-300">
+            Browse our curated collection of high-quality free coding resources
+          </p>
+        </motion.div>
 
-      {/* Category Filter */}
-      <motion.div
-        variants={itemVariants}
-        className="flex flex-wrap justify-center gap-2"
-      >
-        {categories?.map((category: CategoryType) => (
-          <Button
-            key={category.id}
-            onClick={() => updateFilters({ category: category.name })}
-            variant="outline"
-            size="sm"
-            className={cn(
-              "rounded-full text-sm hover:bg-yellow-500 hover:text-white",
-              tab.category === category.name && "bg-primary text-white"
-            )}
-          >
-            {category.name}
-          </Button>
-        ))}
-        {tab.category && (
-          <Button
-            onClick={() => updateFilters({ category: undefined })}
-            variant="secondary"
-            size="sm"
-            className="rounded-full text-sm"
-          >
-            Clear
-          </Button>
-        )}
-      </motion.div>
-
-      {/* Tabs and Tags */}
-      <motion.div variants={itemVariants}>
-        <div className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex justify-center">
-              <Tabs
-                defaultValue={resourceType ? resourceType : "all"}
-                className="w-full max-w-md"
-              >
-                <TabsList className="grid w-full grid-cols-3">
-                  {["all", "video", "article"].map((type) => (
-                    <TabsTrigger
-                      key={type}
-                      value={type}
-                      onClick={() =>
-                        updateFilters({
-                          resourceType: type !== "all" ? type : undefined,
-                        })
-                      }
-                    >
-                      {type.charAt(0).toUpperCase() + type.slice(1)}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-            </div>
-
-            {/* Tags Selection */}
-            <div className="flex flex-col items-center justify-center gap-3">
-              {tags?.length > 0 && (
-                <div>
-                  <ResourcesTags
-                    initialTags={tags?.map((tag: TagType) => tag.name) ?? []}
-                    selectedTags={tab.tags ? tab.tags.split(",") : []}
-                    handleTagsClick={(checked, tag) => {
-                      setTab((prev) => {
-                        const currentTags = prev.tags
-                          ? prev.tags.split(",")
-                          : [];
-                        const updatedTags = checked
-                          ? [...currentTags, tag]
-                          : currentTags.filter((t) => t !== tag);
-                        return {
-                          ...prev,
-                          tags: updatedTags.length
-                            ? updatedTags.join(",")
-                            : undefined,
-                        };
-                      });
-                    }}
-                  />
-                </div>
+        {/* Category Filter */}
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-wrap justify-center gap-2"
+        >
+          {categories?.map((category: CategoryType) => (
+            <Button
+              key={category.id}
+              onClick={() => updateFilters({ category: category.name })}
+              variant="outline"
+              size="sm"
+              className={cn(
+                "rounded-full text-sm hover:bg-yellow-500 hover:text-white",
+                tab.category === category.name && "bg-primary text-white"
               )}
-
-              {/* Clear All Button (Shown Only if Tags are Selected) */}
-              {tab.tags && (
-                <Button
-                  onClick={clearAllTags}
-                  variant="secondary"
-                  size="sm"
-                  className="rounded-full text-sm"
-                >
-                  Clear All
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Resource List */}
-        {allResources && allResources.length > 0 ? (
-          <div className="mt-10">
-            <InfiniteScrollContainer
-              onBottomReached={() =>
-                hasNextPage && !isFetching && fetchNextPage()
-              }
             >
-              <Masonry
-                breakpointCols={breakpointColumnsObj}
-                className="flex w-auto gap-6"
-                columnClassName="masonry-column"
-              >
-                {allResources.map((resource, index) => (
-                  <motion.div
-                    key={resource.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.5,
-                      delay: index * 0.05, // <-- This staggers cards by 50ms each
-                    }}
-                  >
-                    <ResourceCard
-                      resource={resource}
-                      debouncedTab={debouncedTab}
+              {category.name}
+            </Button>
+          ))}
+          {tab.category && (
+            <Button
+              onClick={() => updateFilters({ category: undefined })}
+              variant="secondary"
+              size="sm"
+              className="rounded-full text-sm"
+            >
+              Clear
+            </Button>
+          )}
+        </motion.div>
+
+        {/* Tabs and Tags */}
+        <motion.div variants={itemVariants}>
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <Tabs
+                  defaultValue={resourceType ? resourceType : "all"}
+                  className="w-full max-w-md"
+                >
+                  <TabsList className="grid w-full grid-cols-3">
+                    {["all", "video", "article"].map((type) => (
+                      <TabsTrigger
+                        key={type}
+                        value={type}
+                        onClick={() =>
+                          updateFilters({
+                            resourceType: type !== "all" ? type : undefined,
+                          })
+                        }
+                      >
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </Tabs>
+              </div>
+
+              {/* Tags Selection */}
+              <div className="flex flex-col items-center justify-center gap-3">
+                {tags?.length > 0 && (
+                  <div>
+                    <ResourcesTags
+                      initialTags={tags?.map((tag: TagType) => tag.name) ?? []}
+                      selectedTags={tab.tags ? tab.tags.split(",") : []}
+                      handleTagsClick={(checked, tag) => {
+                        setTab((prev) => {
+                          const currentTags = prev.tags
+                            ? prev.tags.split(",")
+                            : [];
+                          const updatedTags = checked
+                            ? [...currentTags, tag]
+                            : currentTags.filter((t) => t !== tag);
+                          return {
+                            ...prev,
+                            tags: updatedTags.length
+                              ? updatedTags.join(",")
+                              : undefined,
+                          };
+                        });
+                      }}
                     />
-                  </motion.div>
-                ))}
-              </Masonry>
-              {isFetchingNextPage && (
-                <div className="my-4 flex justify-center">
-                  <ScaleLoader color="#f59e0b" />
-                </div>
-              )}
-            </InfiniteScrollContainer>
+                  </div>
+                )}
+
+                {/* Clear All Button (Shown Only if Tags are Selected) */}
+                {tab.tags && (
+                  <Button
+                    onClick={clearAllTags}
+                    variant="secondary"
+                    size="sm"
+                    className="rounded-full text-sm"
+                  >
+                    Clear All
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
-        ) : isFetching ? (
-          <div className="my-4 flex justify-center">
-            <ScaleLoader color="#f59e0b" />
-          </div>
-        ) : (
-          <motion.div
-            className="py-12 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <h3 className="mb-2 text-xl font-medium">No resources found</h3>
-          </motion.div>
-        )}
+
+          {/* Resource List */}
+          {allResources && allResources.length > 0 ? (
+            <div className="mt-10">
+              <InfiniteScrollContainer
+                onBottomReached={() =>
+                  hasNextPage && !isFetching && fetchNextPage()
+                }
+              >
+                <Masonry
+                  breakpointCols={breakpointColumnsObj}
+                  className="flex w-auto gap-6"
+                  columnClassName="masonry-column"
+                >
+                  {allResources.map((resource, index) => (
+                    <motion.div
+                      key={resource.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.5,
+                        delay: index * 0.05, // <-- This staggers cards by 50ms each
+                      }}
+                    >
+                      <ResourceCard
+                        resource={resource}
+                        debouncedTab={debouncedTab}
+                      />
+                    </motion.div>
+                  ))}
+                </Masonry>
+                {isFetchingNextPage && (
+                  <div className="my-4 flex justify-center">
+                    <ScaleLoader color="#f59e0b" />
+                  </div>
+                )}
+              </InfiniteScrollContainer>
+            </div>
+          ) : isFetching ? (
+            <div className="my-4 flex justify-center">
+              <ScaleLoader color="#f59e0b" />
+            </div>
+          ) : (
+            <motion.div
+              className="py-12 text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <h3 className="mb-2 text-xl font-medium">No resources found</h3>
+            </motion.div>
+          )}
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </UpvoteProvider>
   );
 };

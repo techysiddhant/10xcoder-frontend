@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 
 import { getResource } from "@/lib/http";
 
+import { UpvoteProvider } from "../providers/upvote-provider";
 import { ResourceDetail } from "./resource-detail";
 
 type ResourceMainProps = {
@@ -36,17 +37,19 @@ export const ResourceMain = ({ id }: ResourceMainProps) => {
     },
   });
   return (
-    <div className="container mx-auto px-4 pb-16">
-      <motion.div
-        variants={pageVariants}
-        initial="hidden"
-        animate="visible"
-        className="space-y-12"
-      >
-        <motion.div variants={itemVariants}>
-          {resource && <ResourceDetail resource={resource} />}
+    <UpvoteProvider>
+      <div className="container mx-auto px-4 pb-16">
+        <motion.div
+          variants={pageVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-12"
+        >
+          <motion.div variants={itemVariants}>
+            {resource && <ResourceDetail resource={resource} />}
+          </motion.div>
         </motion.div>
-      </motion.div>
-    </div>
+      </div>
+    </UpvoteProvider>
   );
 };

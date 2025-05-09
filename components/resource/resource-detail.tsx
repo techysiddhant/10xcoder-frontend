@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 
 import { CustomImage } from "../custom-image";
 import { LazyIFrame } from "../lazy-iframe";
+import { useUpvoteCounts } from "../providers/upvote-provider";
 import { ResourcePlaceholder } from "../resource-placeholder";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -49,6 +50,11 @@ const itemVariants = {
   },
 };
 export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
+  const { upvoteCounts } = useUpvoteCounts();
+  const upvoteCount =
+    upvoteCounts[resource.id] !== undefined
+      ? upvoteCounts[resource.id]
+      : resource.upvoteCount;
   const { theme } = useTheme();
   const currentTheme = useMemo(() => theme, [theme]);
   const queryClient = useQueryClient();
@@ -273,7 +279,7 @@ export const ResourceDetail = ({ resource }: { resource: ResourceType }) => {
                       ></path>
                     </svg>
                   )}
-                  <span className="text-xl">{resource?.upvoteCount}</span>
+                  <span className="text-xl">{upvoteCount}</span>
                 </button>
                 <button
                   aria-label={
