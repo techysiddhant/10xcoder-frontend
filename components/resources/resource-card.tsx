@@ -19,6 +19,7 @@ import { ResourceType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 import { CustomImage } from "../custom-image";
+import { useUpvoteCounts } from "../providers/upvote-provider";
 import { Filters } from "./resource-main";
 
 export const ResourceCard = ({
@@ -28,6 +29,11 @@ export const ResourceCard = ({
   resource: ResourceType;
   debouncedTab?: Filters;
 }) => {
+  const { upvoteCounts } = useUpvoteCounts();
+  const upvoteCount =
+    upvoteCounts[resource.id] !== undefined
+      ? upvoteCounts[resource.id]
+      : resource.upvoteCount;
   const { theme } = useTheme();
   const currentTheme = useMemo(() => theme, [theme]);
   const queryClient = useQueryClient();
@@ -45,13 +51,13 @@ export const ResourceCard = ({
     mutationFn: async (resourceId: string) => {
       return (await upvoteResource(resourceId)).data;
     },
-    onSuccess: ({ resourceId, action, count }) => {
+    onSuccess: ({ resourceId, action }) => {
       queryClient.setQueryData(["resource", resourceId], (oldResource: any) => {
         if (!oldResource) return oldResource;
 
         return {
           ...oldResource,
-          upvoteCount: count,
+          // upvoteCount: count,
           hasUpvoted: action === "added",
         };
       });
@@ -71,7 +77,7 @@ export const ResourceCard = ({
                 if (resource.id === resourceId) {
                   return {
                     ...resource,
-                    upvoteCount: count,
+                    // upvoteCount: count,
                     hasUpvoted: action === "added",
                   };
                 }
@@ -313,7 +319,7 @@ export const ResourceCard = ({
                     ></path>
                   </svg>
                 )}
-                <span>{resource.upvoteCount}</span>
+                <span>{upvoteCount}</span>
               </div>
               <Button
                 variant="ghost"
