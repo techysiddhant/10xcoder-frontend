@@ -79,7 +79,7 @@ export const SearchMain = () => {
       ...searchData,
       query: query,
     });
-    router.push(`/search?query=${query}`);
+    router.push(`/search?query=${encodeURIComponent(query ?? "")}`);
   };
 
   return (
