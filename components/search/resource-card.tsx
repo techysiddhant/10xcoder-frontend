@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 
 import { CustomImage } from "../custom-image";
 import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 
@@ -118,14 +117,10 @@ export const ResourceCard = ({ resource }: { resource: ResourceType }) => {
 
             {/* View Button */}
             <div className="mt-auto flex items-center justify-between">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-primary dark:text-primary flex h-auto items-center text-xs"
-              >
+              <span className="text-primary dark:text-primary flex h-auto items-center text-xs">
                 <span>View</span>
                 <ArrowUpRight size={12} className="ml-1" />
-              </Button>
+              </span>
             </div>
           </div>
         </Card>

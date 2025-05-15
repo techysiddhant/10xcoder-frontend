@@ -73,7 +73,7 @@ export const SearchMain = () => {
     setQuery(e.target.value);
   };
 
-  const handleSearchButton = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSearchButton = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSearchData({
       ...searchData,
@@ -104,24 +104,25 @@ export const SearchMain = () => {
         className="flex justify-center"
       >
         <div className="relative mx-auto w-full max-w-md">
-          <Search
-            size={18}
-            className="absolute top-1/2 left-3 -translate-y-1/2 transform text-slate-400"
-          />
-          <Input
-            type="text"
-            placeholder="Search resources"
-            value={query}
-            onChange={handleSearch}
-            className="dark:bg-card w-full rounded-lg border-slate-200 bg-white py-6 pl-10 shadow-sm transition-all duration-200 focus:border-amber-500 focus:ring-blue-500 dark:border-amber-500/40"
-          />
-          <Button
-            onClick={handleSearchButton}
-            type="submit"
-            className="absolute top-1/2 right-2 -translate-y-1/2 transform text-white"
-          >
-            Search
-          </Button>
+          <form onSubmit={handleSearchButton}>
+            <Search
+              size={18}
+              className="absolute top-1/2 left-3 -translate-y-1/2 transform text-slate-400"
+            />
+            <Input
+              type="text"
+              placeholder="Search resources"
+              value={query}
+              onChange={handleSearch}
+              className="dark:bg-card w-full rounded-lg border-slate-200 bg-white py-6 pl-10 shadow-sm transition-all duration-200 focus:border-amber-500 focus:ring-blue-500 dark:border-amber-500/40"
+            />
+            <Button
+              type="submit"
+              className="absolute top-1/2 right-2 -translate-y-1/2 transform text-white"
+            >
+              Search
+            </Button>
+          </form>
         </div>
       </motion.div>
       {/* Resource List */}
