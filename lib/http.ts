@@ -42,3 +42,8 @@ export const getBookmarks = (queryString: string) =>
   api.get(`/user/bookmarks?${queryString}`, {
     withCredentials: true,
   });
+
+export const searchResources = (queryString: string) =>
+  api.get(`/search?${queryString}`, {
+    withCredentials: true,
+  });

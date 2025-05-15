@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { Search } from "lucide-react";
 import queryString from "query-string";
 import Masonry from "react-masonry-css";
 import { ScaleLoader } from "react-spinners";
@@ -17,6 +18,7 @@ import { cn } from "@/lib/utils";
 import InfiniteScrollContainer from "../infinite-scroll-container";
 import { UpvoteProvider } from "../providers/upvote-provider";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { ResourceCard } from "./resource-card";
 import { ResourcesTags } from "./resources-tags";
@@ -54,7 +56,7 @@ export const ResourceMain = () => {
   const searchParams = useSearchParams();
   const queryTags = searchParams.get("tag")?.split(",") || [];
   const resourceType = searchParams.get("resourceType");
-  // Store filters in state
+  const [query, setQuery] = useState(""); // Store filters in state
   const [tab, setTab] = useState<Filters>({
     ...queryString.parse(searchParams.toString()),
     tags: queryTags.length ? queryTags.join(",") : undefined,
@@ -95,9 +97,6 @@ export const ResourceMain = () => {
         if (debouncedTab.tags) {
           params.append("tags", debouncedTab.tags);
         }
-        if (debouncedTab.q) {
-          params.append("q", debouncedTab.q);
-        }
         if (pageParam) {
           params.append("cursor", pageParam);
         }
@@ -129,6 +128,15 @@ export const ResourceMain = () => {
     updateFilters({ tags: undefined });
   };
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+  };
+
+  const handleSearchButton = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    router.push(`/search?query=${query}`);
+  };
+
   return (
     <UpvoteProvider>
       <motion.div
@@ -149,6 +157,33 @@ export const ResourceMain = () => {
           <p className="text-slate-600 dark:text-slate-300">
             Browse our curated collection of high-quality free coding resources
           </p>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="flex justify-center"
+        >
+          <div className="relative mx-auto w-full max-w-md">
+            <Search
+              size={18}
+              className="absolute top-1/2 left-3 -translate-y-1/2 transform text-slate-400"
+            />
+            <Input
+              type="text"
+              placeholder="Search resources"
+              value={query}
+              onChange={handleSearch}
+              className="dark:bg-card w-full rounded-lg border-slate-200 bg-white py-6 pl-10 shadow-sm transition-all duration-200 focus:border-amber-500 focus:ring-blue-500 dark:border-amber-500/40"
+            />
+            <Button
+              onClick={handleSearchButton}
+              type="submit"
+              className="absolute top-1/2 right-2 -translate-y-1/2 transform text-white"
+            >
+              Search
+            </Button>
+          </div>
         </motion.div>
 
         {/* Category Filter */}
