@@ -21,6 +21,11 @@ const eslintConfig = [
         "quotes": ["error", "double"],
         "n/no-process-env": ["error"],
         "react/no-unescaped-entities": ["error"],
+        "@typescript-eslint/no-unused-vars": ["error", { 
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_",
+      "caughtErrorsIgnorePattern": "^_"
+    }],
         "check-file/filename-naming-convention": [
           "error",
           {

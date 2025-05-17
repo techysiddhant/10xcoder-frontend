@@ -28,7 +28,7 @@ export type Checked = DropdownMenuCheckboxItemProps["checked"];
 interface ResourcesTagsProps {
   initialTags: string[];
   selectedTags: string[];
-  handleTagsClick: (checked: Checked, tag: string) => void;
+  handleTagsClick: (tag: string) => void;
   clearAllTags: () => void;
 }
 
@@ -48,13 +48,13 @@ export const ResourcesTags = ({
             role="combobox"
             aria-expanded={open}
             aria-label="Select tags"
-            className="w-[200px] justify-between capitalize"
+            className="w-fit justify-between capitalize"
           >
             {selectedTags.length > 0
-              ? selectedTags.length > 2
+              ? selectedTags.length > 6
                 ? `${selectedTags.length} selected`
                 : selectedTags.join(", ")
-              : "Select tags..."}
+              : "Filter by tags..."}
             <ChevronsUpDown className="opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -70,7 +70,7 @@ export const ResourcesTags = ({
                     key={tag}
                     value={tag}
                     onSelect={(currentValue) => {
-                      handleTagsClick(true, currentValue);
+                      handleTagsClick(currentValue);
                     }}
                   >
                     {tag}

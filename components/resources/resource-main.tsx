@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -23,23 +23,22 @@ import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { ResourceCard } from "./resource-card";
 import { ResourcesTags } from "./resources-tags";
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 const pageVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.05, // Reduced from 0.1 for faster animation
     },
   },
 };
+
 const itemVariants = {
   hidden: { opacity: 0, y: 10 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4 },
+    transition: { duration: 0.3 }, // Reduced from 0.4 for faster animation
   },
 };
 
@@ -54,35 +53,47 @@ export const ResourceMain = () => {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const queryTags = searchParams.get("tag")?.split(",") || [];
-  const resourceType = searchParams.get("resourceType");
-  const [query, setQuery] = useState(""); // Store filters in state
-  const [tab, setTab] = useState<Filters>({
-    ...queryString.parse(searchParams.toString()),
-    tags: queryTags.length ? queryTags.join(",") : undefined,
-  });
+
+  // Extract query parameters once
+  const initialParams = useMemo(() => {
+    const queryTags = searchParams.get("tag")?.split(",") || [];
+    return {
+      ...queryString.parse(searchParams.toString()),
+      tags: queryTags.length ? queryTags.join(",") : undefined,
+      resourceType: searchParams.get("resourceType") || undefined,
+      category: searchParams.get("category") || undefined,
+    };
+  }, [searchParams]);
+
+  const [query, setQuery] = useState("");
+  const [tab, setTab] = useState<Filters>(initialParams);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Apply debounce to prevent rapid API calls
+  const debouncedTab = useDebounce(tab, 500);
+
   const breakpointColumnsObj = {
     default: 4,
     1100: 3,
     700: 2,
     500: 1,
   };
-  // 🔹 Apply debounce to `tab` to prevent rapid API calls
-  const debouncedTab = useDebounce(tab, 500);
 
-  // Fetch Data
-  const { data: tags } = useQuery({
+  // Optimized data fetching with stale-time and cache configuration
+  const { data: tags, isLoading: isTagsLoading } = useQuery({
     queryKey: ["tags"],
-    queryFn: async () => {
-      return getTags().then((res) => res.data);
-    },
+    queryFn: async () => getTags().then((res) => res.data),
+    staleTime: 5 * 60 * 1000, // Cache tags for 5 minutes
+    refetchOnWindowFocus: false,
   });
-  const { data: categories } = useQuery({
+
+  const { data: categories, isLoading: isCategoriesLoading } = useQuery({
     queryKey: ["categories"],
-    queryFn: async () => {
-      return getCategories().then((res) => res.data);
-    },
+    queryFn: async () => getCategories().then((res) => res.data),
+    staleTime: 5 * 60 * 1000, // Cache categories for 5 minutes
+    refetchOnWindowFocus: false,
   });
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } =
     useInfiniteQuery({
       queryKey: ["resources", debouncedTab],
@@ -105,37 +116,78 @@ export const ResourceMain = () => {
       initialPageParam: undefined,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
       enabled: !!debouncedTab,
+      refetchOnWindowFocus: false,
+      staleTime: 60 * 1000, // Cache resources for 1 minute
     });
-  const allResources = data?.pages.flatMap((page) => page.resources) ?? [];
-  const updateFilters = (updates: Partial<Filters>) => {
+
+  // Memoize resources to prevent unnecessary re-renders
+  const allResources = useMemo(
+    () => data?.pages.flatMap((page) => page.resources) ?? [],
+    [data?.pages]
+  );
+
+  // Use callback for filter updates to prevent recreating function on each render
+  const updateFilters = useCallback((updates: Partial<Filters>) => {
     setTab((prev) => ({ ...prev, ...updates }));
-  };
-  // Push updated filters to the URL when `tab` changes
+  }, []);
+
+  // Push updated filters to the URL when `debouncedTab` changes
   useEffect(() => {
     const filteredParams = Object.fromEntries(
-      Object.entries(tab).filter(([key, v]) => v !== undefined && v !== "")
+      Object.entries(tab).filter(([_, v]) => v !== undefined && v !== "")
     );
+
     const newUrl = queryString.stringifyUrl({
       url: pathname,
       query: filteredParams,
     });
 
     router.push(newUrl, { scroll: false });
-  }, [tab, pathname, router]);
+  }, [debouncedTab, pathname, router]);
 
-  // Clear all selected tags
-  const clearAllTags = () => {
+  // Memoized handlers for better performance
+  const clearAllTags = useCallback(() => {
     updateFilters({ tags: undefined });
-  };
+  }, [updateFilters]);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
-  };
+  }, []);
 
-  const handleSearchButton = (e: React.MouseEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    router.push(`/search?query=${encodeURIComponent(query)}`);
-  };
+  const handleSearchButton = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setIsSearching(true);
+      router.push(`/search?query=${encodeURIComponent(query)}`);
+    },
+    [query, router]
+  );
+
+  const handleTagsClick = useCallback((tag: string) => {
+    setTab((prev) => {
+      const currentTags = prev.tags ? prev.tags.split(",") : [];
+      const updatedTags = currentTags.includes(tag)
+        ? currentTags.filter((t) => t !== tag)
+        : [...currentTags, tag];
+
+      return {
+        ...prev,
+        tags: updatedTags.length ? updatedTags.join(",") : undefined,
+      };
+    });
+  }, []);
+
+  // Determine if we're in a loading state
+  const isLoading = isTagsLoading || isCategoriesLoading || isSearching;
+
+  // Show a loading indicator while initial data loads
+  if (isLoading && !allResources.length) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <ScaleLoader color="#f59e0b" />
+      </div>
+    );
+  }
 
   return (
     <UpvoteProvider>
@@ -143,25 +195,27 @@ export const ResourceMain = () => {
         variants={pageVariants}
         initial="hidden"
         animate="visible"
-        className="space-y-10"
+        className="space-y-8" // Reduced from space-y-10
       >
         <motion.div
           variants={itemVariants}
-          className="mx-auto max-w-2xl space-y-4 text-center"
+          className="mx-auto max-w-2xl space-y-3" // Reduced from space-y-4
         >
-          <h1 className="text-3xl font-bold text-slate-900 capitalize dark:text-white">
+          <h1 className="text-center text-3xl font-bold text-slate-900 capitalize dark:text-white">
             {debouncedTab.category
               ? `${debouncedTab.category} Resources`
               : "Resources"}
           </h1>
-          <p className="text-slate-600 dark:text-slate-300">
+          <p className="text-center text-slate-600 dark:text-slate-300">
             Browse our curated collection of high-quality free coding resources
           </p>
         </motion.div>
+
+        {/* Search Bar */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
+          transition={{ duration: 0.3, delay: 0.1 }} // Reduced delay
           className="flex justify-center"
         >
           <div className="relative mx-auto w-full max-w-md">
@@ -221,11 +275,15 @@ export const ResourceMain = () => {
 
         {/* Tabs and Tags */}
         <motion.div variants={itemVariants}>
-          <div className="space-y-6">
-            <div className="space-y-4">
+          <div className="space-y-5">
+            {" "}
+            {/* Reduced from space-y-6 */}
+            <div className="space-y-3">
+              {" "}
+              {/* Reduced from space-y-4 */}
               <div className="flex justify-center">
                 <Tabs
-                  defaultValue={resourceType ? resourceType : "all"}
+                  defaultValue={tab.resourceType || "all"}
                   className="w-full max-w-md"
                 >
                   <TabsList className="grid w-full grid-cols-3">
@@ -245,7 +303,6 @@ export const ResourceMain = () => {
                   </TabsList>
                 </Tabs>
               </div>
-
               {/* Tags Selection */}
               <div className="flex flex-col items-center justify-center gap-3">
                 {tags?.length > 0 && (
@@ -254,28 +311,13 @@ export const ResourceMain = () => {
                       initialTags={tags?.map((tag: TagType) => tag.name) ?? []}
                       selectedTags={tab.tags ? tab.tags.split(",") : []}
                       clearAllTags={clearAllTags}
-                      handleTagsClick={(checked, tag) => {
-                        setTab((prev) => {
-                          const currentTags = prev.tags
-                            ? prev.tags.split(",")
-                            : [];
-                          const updatedTags = checked
-                            ? [...currentTags, tag]
-                            : currentTags.filter((t) => t !== tag);
-                          return {
-                            ...prev,
-                            tags: updatedTags.length
-                              ? updatedTags.join(",")
-                              : undefined,
-                          };
-                        });
-                      }}
+                      handleTagsClick={handleTagsClick}
                     />
                   </div>
                 )}
 
                 {/* Clear All Button (Shown Only if Tags are Selected) */}
-                {tab.tags && (
+                {/* {tab.tags && (
                   <Button
                     onClick={clearAllTags}
                     variant="secondary"
@@ -284,14 +326,16 @@ export const ResourceMain = () => {
                   >
                     Clear All
                   </Button>
-                )}
+                )} */}
               </div>
             </div>
           </div>
 
           {/* Resource List */}
           {allResources && allResources.length > 0 ? (
-            <div className="mt-10">
+            <div className="mt-8">
+              {" "}
+              {/* Reduced from mt-10 */}
               <InfiniteScrollContainer
                 onBottomReached={() =>
                   hasNextPage && !isFetching && fetchNextPage()
@@ -299,7 +343,7 @@ export const ResourceMain = () => {
               >
                 <Masonry
                   breakpointCols={breakpointColumnsObj}
-                  className="flex w-auto gap-6"
+                  className="flex w-auto gap-5" // Reduced from gap-6
                   columnClassName="masonry-column"
                 >
                   {allResources.map((resource, index) => (
@@ -308,8 +352,8 @@ export const ResourceMain = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{
-                        duration: 0.5,
-                        delay: index * 0.05, // <-- This staggers cards by 50ms each
+                        duration: 0.4, // Reduced from 0.5
+                        delay: Math.min(index * 0.03, 0.9), // Limit max delay to 0.9s
                       }}
                     >
                       <ResourceCard
@@ -332,7 +376,7 @@ export const ResourceMain = () => {
             </div>
           ) : (
             <motion.div
-              className="py-12 text-center"
+              className="py-10 text-center" // Reduced from py-12
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
