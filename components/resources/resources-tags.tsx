@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
+// Removed unused DropdownMenuCheckboxItemProps and Checked
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import {
@@ -22,8 +22,6 @@ import { cn } from "@/lib/utils";
 
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-
-export type Checked = DropdownMenuCheckboxItemProps["checked"];
 
 interface ResourcesTagsProps {
   initialTags: string[];
@@ -50,11 +48,12 @@ export const ResourcesTags = ({
             aria-label="Select tags"
             className="w-fit justify-between capitalize"
           >
-            {selectedTags.length > 0
-              ? selectedTags.length > 6
-                ? `${selectedTags.length} selected`
-                : selectedTags.join(", ")
-              : "Filter by tags..."}
+            {useMemo(() => {
+              if (selectedTags.length === 0) return "Filter by tags...";
+              if (selectedTags.length > 6)
+                return `${selectedTags.length} selected`;
+              return selectedTags.join(", ");
+            }, [selectedTags])}
             <ChevronsUpDown className="opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -69,8 +68,8 @@ export const ResourcesTags = ({
                     className="capitalize"
                     key={tag}
                     value={tag}
-                    onSelect={(currentValue) => {
-                      handleTagsClick(currentValue);
+                    onSelect={() => {
+                      handleTagsClick(tag);
                     }}
                   >
                     {tag}

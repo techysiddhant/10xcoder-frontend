@@ -134,7 +134,9 @@ export const ResourceMain = () => {
   // Push updated filters to the URL when `debouncedTab` changes
   useEffect(() => {
     const filteredParams = Object.fromEntries(
-      Object.entries(tab).filter(([_, v]) => v !== undefined && v !== "")
+      Object.entries(debouncedTab).filter(
+        ([_, v]) => v !== undefined && v !== ""
+      )
     );
 
     const newUrl = queryString.stringifyUrl({
@@ -159,6 +161,7 @@ export const ResourceMain = () => {
       e.preventDefault();
       setIsSearching(true);
       router.push(`/search?query=${encodeURIComponent(query)}`);
+      setIsSearching(false);
     },
     [query, router]
   );
