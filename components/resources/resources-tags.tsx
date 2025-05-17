@@ -1,18 +1,27 @@
 "use client";
 
+import { useState } from "react";
+
 import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
-import { Tags } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 
 export type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -20,37 +29,86 @@ interface ResourcesTagsProps {
   initialTags: string[];
   selectedTags: string[];
   handleTagsClick: (checked: Checked, tag: string) => void;
+  clearAllTags: () => void;
 }
 
 export const ResourcesTags = ({
   selectedTags,
   initialTags,
   handleTagsClick,
+  clearAllTags,
 }: ResourcesTagsProps) => {
+  const [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col items-center justify-center">
-      {/* Tags Dropdown */}
-      <DropdownMenu>
-        <DropdownMenuTrigger className="bg-card flex w-full max-w-96 items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm shadow-sm">
-          <Tags className="size-5" />
-          <span>Filter by Tags</span>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuLabel>Available Tags</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {initialTags?.map((tag) => (
-            <DropdownMenuCheckboxItem
-              key={tag}
-              checked={selectedTags.includes(tag)}
-              onCheckedChange={(checked) => handleTagsClick(checked, tag)}
-            >
-              {tag}
-            </DropdownMenuCheckboxItem>
-          ))}
-          <DropdownMenuSeparator />
-        </DropdownMenuContent>
-      </DropdownMenu>
-
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            aria-label="Select tags"
+            className="w-[200px] justify-between capitalize"
+          >
+            {selectedTags.length > 0
+              ? selectedTags.length > 2
+                ? `${selectedTags.length} selected`
+                : selectedTags.join(", ")
+              : "Select tags..."}
+            <ChevronsUpDown className="opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command>
+            <CommandInput placeholder="Search tags..." className="h-9" />
+            <CommandList>
+              <CommandEmpty>No tags found.</CommandEmpty>
+              <CommandGroup>
+                {initialTags.map((tag) => (
+                  <CommandItem
+                    className="capitalize"
+                    key={tag}
+                    value={tag}
+                    onSelect={(currentValue) => {
+                      handleTagsClick(true, currentValue);
+                    }}
+                  >
+                    {tag}
+                    <Check
+                      className={cn(
+                        "ml-auto",
+                        selectedTags.includes(tag) ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+            <div className="flex items-center border-t p-2">
+              {selectedTags.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    clearAllTags();
+                    setOpen(false);
+                  }}
+                  className="mr-auto h-8 text-xs"
+                >
+                  Clear all
+                </Button>
+              )}
+              <Button
+                size="sm"
+                onClick={() => setOpen(false)}
+                className="ml-auto h-8 text-xs"
+              >
+                Done
+              </Button>
+            </div>
+          </Command>
+        </PopoverContent>
+      </Popover>
       {/* Selected Tags Display */}
       {selectedTags.length > 0 && (
         <div className="mt-3 flex flex-wrap justify-center gap-2">
@@ -58,7 +116,7 @@ export const ResourcesTags = ({
             <Badge
               key={tag}
               variant="secondary"
-              className="flex items-center space-x-1 bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-800/30"
+              className="text-primary flex items-center space-x-1 bg-amber-500/10"
             >
               {tag}
             </Badge>

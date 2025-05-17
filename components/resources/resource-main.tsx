@@ -253,6 +253,7 @@ export const ResourceMain = () => {
                     <ResourcesTags
                       initialTags={tags?.map((tag: TagType) => tag.name) ?? []}
                       selectedTags={tab.tags ? tab.tags.split(",") : []}
+                      clearAllTags={clearAllTags}
                       handleTagsClick={(checked, tag) => {
                         setTab((prev) => {
                           const currentTags = prev.tags
