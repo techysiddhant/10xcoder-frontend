@@ -13,7 +13,7 @@ const eslintConfig = [
   ...compat.config(
     {
       "extends": ["next/core-web-vitals", "next/typescript", "prettier"],
-      "plugins": ["check-file", "n"],
+      "plugins": ["check-file", "n", "@typescript-eslint"],
       "rules": {
         "prefer-arrow-callback": ["error"],
         "prefer-template": ["error"],
@@ -21,6 +21,12 @@ const eslintConfig = [
         "quotes": ["error", "double"],
         "n/no-process-env": ["error"],
         "react/no-unescaped-entities": ["error"],
+        "@typescript-eslint/no-unused-vars": ["error", { 
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_",
+      "caughtErrorsIgnorePattern": "^_",
+      "ignoreRestSiblings": true
+    }],
         "check-file/filename-naming-convention": [
           "error",
           {
