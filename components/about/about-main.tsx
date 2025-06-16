@@ -122,6 +122,7 @@ export const AboutMain = () => {
             <Link
               href="https://github.com/techysiddhant/10xcoder-frontend"
               target="_blank"
+              rel="noopener noreferrer"
             >
               <Button
                 className="text-secondary dark:text-secondary-foreground flex items-center gap-2"
