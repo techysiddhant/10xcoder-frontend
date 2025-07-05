@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -117,13 +119,19 @@ export const AboutMain = () => {
             we&lsquo;d love to hear from you!
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Button
-              className="text-secondary dark:text-secondary-foreground flex items-center gap-2"
-              size="lg"
+            <Link
+              href="https://github.com/techysiddhant/10xcoder-frontend"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <Github className="h-5 w-5" />
-              <span>GitHub Repository</span>
-            </Button>
+              <Button
+                className="text-secondary dark:text-secondary-foreground flex items-center gap-2"
+                size="lg"
+              >
+                <Github className="h-5 w-5" />
+                <span>GitHub Repository</span>
+              </Button>
+            </Link>
             <Button
               variant="outline"
               className="flex items-center gap-2"
