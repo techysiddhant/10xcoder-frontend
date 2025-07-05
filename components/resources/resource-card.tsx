@@ -2,6 +2,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -10,10 +11,12 @@ import parse from "html-react-parser";
 import DOMPurify from "isomorphic-dompurify";
 import { ArrowUpRight, FileText, Tag, Video } from "lucide-react";
 import { useTheme } from "next-themes";
+import toast from "react-hot-toast";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useSession } from "@/hooks/use-session";
 import { addOrRemoveBookmark, upvoteResource } from "@/lib/http";
 import { ResourceType } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -36,6 +39,8 @@ export const ResourceCard = ({
       : resource.upvoteCount;
   const { theme } = useTheme();
   const currentTheme = useMemo(() => theme, [theme]);
+  const { data: session } = useSession();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const bookmarkMutation = useMutation({
     mutationFn: async (resourceId: string) => {
@@ -92,11 +97,23 @@ export const ResourceCard = ({
   const handleUpvote = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!session) {
+      toast.error("Please login to upvote");
+      router.push("/signin?callbackUrl=/resources");
+      return;
+    }
+
     upvoteMutation.mutate(resource.id);
   };
   const handleBookmark = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!session) {
+      toast.error("Please login to bookmark");
+      router.push("/signin?callbackUrl=/resources");
+      return;
+    }
+
     bookmarkMutation.mutate(resource.id);
   };
   const getTypeIcon = () => {

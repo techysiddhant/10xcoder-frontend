@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,7 +27,8 @@ import { signInSchema } from "@/lib/schema";
 type FormValues = z.infer<typeof signInSchema>;
 export const SigninForm = () => {
   const [isLoading, setIsLoading] = useState(false);
-
+  const searchParams = useSearchParams();
+  const callback = searchParams.get("callbackUrl");
   const form = useForm<FormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -40,7 +42,7 @@ export const SigninForm = () => {
         {
           email: data.email,
           password: data.password,
-          callbackURL: env.NEXT_PUBLIC_URL,
+          callbackURL: callback ? callback : env.NEXT_PUBLIC_URL,
         },
         {
           onRequest: () => {
