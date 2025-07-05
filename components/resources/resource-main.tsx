@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -17,6 +18,7 @@ import { cn } from "@/lib/utils";
 
 import InfiniteScrollContainer from "../infinite-scroll-container";
 import { UpvoteProvider } from "../providers/upvote-provider";
+import { ResourceCardSkeleton } from "../search/resource-card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
@@ -94,31 +96,37 @@ export const ResourceMain = () => {
     refetchOnWindowFocus: false,
   });
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } =
-    useInfiniteQuery({
-      queryKey: ["resources", debouncedTab],
-      queryFn: async ({ pageParam }) => {
-        const params = new URLSearchParams();
-        if (debouncedTab.resourceType) {
-          params.append("resourceType", debouncedTab.resourceType);
-        }
-        if (debouncedTab.category) {
-          params.append("category", debouncedTab.category);
-        }
-        if (debouncedTab.tags) {
-          params.append("tags", debouncedTab.tags);
-        }
-        if (pageParam) {
-          params.append("cursor", pageParam);
-        }
-        return getResources(params.toString()).then((res) => res.data);
-      },
-      initialPageParam: undefined,
-      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-      enabled: !!debouncedTab,
-      refetchOnWindowFocus: false,
-      staleTime: 60 * 1000, // Cache resources for 1 minute
-    });
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetching,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: ["resources", debouncedTab],
+    queryFn: async ({ pageParam }) => {
+      const params = new URLSearchParams();
+      if (debouncedTab.resourceType) {
+        params.append("resourceType", debouncedTab.resourceType);
+      }
+      if (debouncedTab.category) {
+        params.append("category", debouncedTab.category);
+      }
+      if (debouncedTab.tags) {
+        params.append("tags", debouncedTab.tags);
+      }
+      if (pageParam) {
+        params.append("cursor", pageParam);
+      }
+      return getResources(params.toString()).then((res) => res.data);
+    },
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    enabled: !!debouncedTab,
+    refetchOnWindowFocus: false,
+    staleTime: 60 * 1000, // Cache resources for 1 minute
+  });
 
   // Memoize resources to prevent unnecessary re-renders
   const allResources = useMemo(
@@ -374,8 +382,10 @@ export const ResourceMain = () => {
               </InfiniteScrollContainer>
             </div>
           ) : isFetching ? (
-            <div className="my-4 flex justify-center">
-              <ScaleLoader color="#f59e0b" />
+            <div className="my-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {[...Array(6)].map((_, index) => (
+                <ResourceCardSkeleton key={index} />
+              ))}
             </div>
           ) : (
             <motion.div
@@ -384,6 +394,24 @@ export const ResourceMain = () => {
               animate={{ opacity: 1 }}
             >
               <h3 className="mb-2 text-xl font-medium">No resources found</h3>
+              <p>
+                Try going back to
+                <Link
+                  className="text-primary px-1 font-medium underline"
+                  href={"/"}
+                >
+                  Home
+                </Link>
+                or
+                <span
+                  className="text-primary cursor-pointer px-1 font-medium underline"
+                  onClick={() => {
+                    refetch();
+                  }}
+                >
+                  Refreshing Page
+                </span>{" "}
+              </p>
             </motion.div>
           )}
         </motion.div>
