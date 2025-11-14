@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { motion } from "framer-motion";
 import {
@@ -14,6 +15,14 @@ import {
 
 import { Button } from "@/components/ui/button";
 
+const CopyRightText = () => {
+  return (
+    <p className="text-muted-foreground">
+      Built with ❤️ by developers, for developers — 10xCoder.club ©{" "}
+      {new Date().getFullYear()}
+    </p>
+  );
+};
 export const AboutMain = () => {
   return (
     <div className="container mx-auto px-4 pb-16">
@@ -144,10 +153,9 @@ export const AboutMain = () => {
         </div>
 
         <div className="text-center">
-          <p className="text-muted-foreground">
-            Built with ❤️ by developers, for developers — 10xCoder.club ©{" "}
-            {new Date().getFullYear()}
-          </p>
+          <Suspense>
+            <CopyRightText />
+          </Suspense>
         </div>
       </motion.div>
     </div>

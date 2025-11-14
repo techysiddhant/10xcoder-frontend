@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import React from "react";
 
 import { ResourceMain } from "@/components/resource/resource-main";
@@ -6,7 +7,7 @@ import { env } from "@/env";
 import { getResource, getResources } from "@/lib/http";
 import { ResourceType } from "@/lib/types";
 
-export const revalidate = 86400;
+// export const revalidate = 86400;
 export async function generateMetadata({
   params,
 }: {
@@ -46,7 +47,7 @@ export async function generateMetadata({
 export async function generateStaticParams() {
   const { data } = await getResources("?limit=25");
   if (data.resources.length === 0) {
-    return [];
+    return [{ id: "__placeholder__" }];
   }
   return data.resources.map((resource: ResourceType) => ({
     id: resource.id,
@@ -59,6 +60,9 @@ const ResourcePage = async ({
   params: Promise<{ id: string }>;
 }) => {
   const { id } = await params;
+  if (id === "__placeholder__") {
+    notFound();
+  }
   return <ResourceMain id={id} />;
 };
 
